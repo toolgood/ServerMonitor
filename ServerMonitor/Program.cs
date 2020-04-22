@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServerMonitor.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ namespace ServerMonitor
     {
         static void Main(string[] args)
         {
+            _ = new PerformanceCounterListener();
+            Console.Read();
+
             var rc = HostFactory.Run(x => {
                 x.Service<MainService>(s => {
                     s.ConstructUsing(name => new MainService());

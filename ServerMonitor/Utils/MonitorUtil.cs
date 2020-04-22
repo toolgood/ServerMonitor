@@ -32,15 +32,41 @@ namespace ServerMonitor.Utils
             thread4.Start();
             listThread.Add(thread4);
             // 获取 硬盘空间
-            Thread thread5 = new Thread(delegate () { GetHardDisk(ref info); });
+            Thread thread51 = new Thread(delegate () { GetHardDisk(ref info); });
+            thread51.Start();
+            listThread.Add(thread51);
+
+            // 获取Disk Read
+            Thread thread5 = new Thread(delegate () { GetDiskRead(ref info); });
             thread5.Start();
             listThread.Add(thread5);
+
+            // 获取Disk Write
+            Thread thread6 = new Thread(delegate () { GetDiskWrite(ref info); });
+            thread6.Start();
+            listThread.Add(thread6);
+
+            // 获取Network Receive
+            Thread thread7 = new Thread(delegate () { GetNetworkReceive(ref info); });
+            thread7.Start();
+            listThread.Add(thread7);
+
+            // 获取Network Send
+            Thread thread8 = new Thread(delegate () { GetNetworkSend(ref info); });
+            thread8.Start();
+            listThread.Add(thread8);
+
 
             foreach (Thread thread in listThread) {
                 thread.Join();
             }
+            foreach (Thread thread in listThread) {
+                thread.Abort();
+            }
             return info;
         }
+ 
+
         private static void GetCpu(ref MachineMonitorInfo info)
         {
             lock (info) {
@@ -88,8 +114,40 @@ namespace ServerMonitor.Utils
                 }
             }
         }
+        // 单kb
+        public static void GetDiskRead(ref MachineMonitorInfo info)
+        {
+            lock (info) {
+                info.diskReadData = (int)((DiskReadMonitor.getValue()) / 1024);
+            }
+        }
+
+        // 单位Kb
+        public static void GetDiskWrite(ref MachineMonitorInfo info)
+        {
+            lock (info) {
+                info.diskWriteData = (int)((DiskWriteMonitor.getValue()) / 1024);
+            }
+        }
+        // 单位Kb
+        public static void GetNetworkReceive(ref MachineMonitorInfo info)
+        {
+            lock (info) {
+                info.networkReceiveData = (int)((NetworkReceiveMonitor.getValue()) / 1024);
+            }
+        }
+
+        // 单位Kb
+        public static void GetNetworkSend(ref MachineMonitorInfo info)
+        {
+            lock (info) {
+                info.networkSendData = (int)((NetworkSendMonitor.getValue()) / 1024);
+            }
+        }
 
     }
+ 
+
     [Serializable]
     public class MachineMonitorInfo
     {
@@ -111,6 +169,11 @@ namespace ServerMonitor.Utils
         public float PhysicalMemory { get; set; }
 
         public List<HardDiskInfo> HardDisks { get; set; }
+
+        public int diskReadData { get; set; }
+        public int diskWriteData { get; set; }
+        public int networkReceiveData { get; set; }
+        public int networkSendData { get; set; }
 
         public override string ToString()
         {
