@@ -9,23 +9,23 @@ namespace WebsiteServiceClient
 {
     public class MainService
     {
-        readonly Timer _timer;
-        private IHost _host;
+        private readonly Timer _timer;
+        private readonly IHost _host;
         public MainService(IHost host)
         {
             _host = host;
             _timer = new Timer(60 * 1000) { AutoReset = true };
-            _timer.Elapsed += _timer_Elapsed;
+            _timer.Elapsed += Timer_Elapsed;
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             //var monitorInfo = MonitorUtil.GetMachineMonitorInfo();
             //var sites = MonitorUtil.GetSiteInfos();
         }
         public void Start()
         {
-            _timer_Elapsed(_timer, null);
+            Timer_Elapsed(_timer, null);
             _timer.Start();
             _host.Run();
         }

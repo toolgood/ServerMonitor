@@ -9,7 +9,7 @@ namespace WebsiteServiceClient.Monitors
     public sealed class NetworkReceiveMonitor
     {
         private static readonly NetworkReceiveMonitor instance = new NetworkReceiveMonitor();
-        private List<PerformanceCounter> counters = new List<PerformanceCounter>();
+        private readonly List<PerformanceCounter> counters = new List<PerformanceCounter>();
 
         private NetworkReceiveMonitor()
         {
@@ -27,12 +27,12 @@ namespace WebsiteServiceClient.Monitors
             System.Threading.Thread.Sleep(1000);
         }
 
-        public static NetworkReceiveMonitor getMonitor()
+        public static NetworkReceiveMonitor GetMonitor()
         {
             return instance;
         }
 
-        public static float getValue()
+        public static float GetValue()
         {
             float value = 0;
             //return instance.counter.NextValue();

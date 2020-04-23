@@ -9,7 +9,7 @@ namespace ServerMonitor.Monitors
     public sealed class CPUMonitor
     {
         private static readonly CPUMonitor instance = new CPUMonitor();
-        private PerformanceCounter pcCpuLoad;
+        private readonly PerformanceCounter pcCpuLoad;
         private CPUMonitor()
         {
             //初始化CPU计数器
@@ -18,11 +18,11 @@ namespace ServerMonitor.Monitors
             pcCpuLoad.NextValue();
             System.Threading.Thread.Sleep(1000);
         }
-        public static CPUMonitor getMonitor()
+        public static CPUMonitor GetMonitor()
         {
             return instance;
         }
-        public static float getValue()
+        public static float GetValue()
         {
             return instance.pcCpuLoad.NextValue();
         }

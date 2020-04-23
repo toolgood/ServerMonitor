@@ -72,28 +72,28 @@ namespace ServerMonitor.Utils
         {
             lock (info)
             {
-                info.CpuUsage = CPUMonitor.getValue();
+                info.CpuUsage = CPUMonitor.GetValue();
             }
         }
         private static void GetCpuCount(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.CoreNumber = ProcessorCountMonitor.getValue();
+                info.CoreNumber = ProcessorCountMonitor.GetValue();
             }
         }
         private static void GetMenoryAvaliable(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.MemoryAvailable = (MemoryMonitor.getMemoryInfo().availPhys / (1024 * 1024 * 1024));
+                info.MemoryAvailable = (MemoryMonitor.GetMemoryInfo().AvailPhys / (1024 * 1024 * 1024));
             }
         }
         private static void GetMenoryTotal(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.PhysicalMemory = (MemoryMonitor.getMemoryInfo().totalPhys / (1024 * 1024 * 1024));
+                info.PhysicalMemory = (MemoryMonitor.GetMemoryInfo().TotalPhys / (1024 * 1024 * 1024));
             }
         }
         private static void GetHardDisk(ref MachineMonitorInfo info)
@@ -124,28 +124,28 @@ namespace ServerMonitor.Utils
         {
             lock (info)
             {
-                info.DiskReadData = (int)((DiskReadMonitor.getValue()) / 1024);
+                info.DiskReadData = (int)((DiskReadMonitor.GetValue()) / 1024);
             }
         }
         private static void GetDiskWrite(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.DiskWriteData = (int)((DiskWriteMonitor.getValue()) / 1024);
+                info.DiskWriteData = (int)((DiskWriteMonitor.GetValue()) / 1024);
             }
         }
         private static void GetNetworkReceive(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.NetworkReceiveData = (int)((NetworkReceiveMonitor.getValue()) / 1024);
+                info.NetworkReceiveData = (int)((NetworkReceiveMonitor.GetValue()) / 1024);
             }
         }
         private static void GetNetworkSend(ref MachineMonitorInfo info)
         {
             lock (info)
             {
-                info.NetworkSendData = (int)((NetworkSendMonitor.getValue()) / 1024);
+                info.NetworkSendData = (int)((NetworkSendMonitor.GetValue()) / 1024);
             }
         }
         #endregion

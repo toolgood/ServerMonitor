@@ -9,10 +9,10 @@ namespace ServerMonitor
         public MainService()
         {
             _timer = new Timer(60 * 1000) { AutoReset = true };
-            _timer.Elapsed += _timer_Elapsed;
+            _timer.Elapsed += Timer_Elapsed;
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var monitorInfo = MonitorUtil.GetMachineMonitorInfo();
             var sites = MonitorUtil.GetSiteInfos();
@@ -20,7 +20,7 @@ namespace ServerMonitor
 
         }
 
-        public void Start() { _timer.Start(); _timer_Elapsed(_timer, null); }
+        public void Start() { _timer.Start(); Timer_Elapsed(_timer, null); }
         public void Stop() { _timer.Stop(); }
     }
 }

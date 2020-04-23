@@ -36,9 +36,9 @@ namespace ServerMonitor.Monitors
     /// </summary>
     public class MemoryInfo
     {
-        public uint memoryLoad { get; set; }//返回00形式
-        public ulong totalPhys { get; set; } //以Bite为单位
-        public ulong availPhys { get; set; }//以Bite为单位
+        public uint MemoryLoad { get; set; }//返回00形式
+        public ulong TotalPhys { get; set; } //以Bite为单位
+        public ulong AvailPhys { get; set; }//以Bite为单位
     }
     public class MemoryMonitor
     {
@@ -54,7 +54,7 @@ namespace ServerMonitor.Monitors
         /// 获取内存信息
         /// </summary>
         /// <returns></returns>
-        public static MemoryInfo getMemoryInfo()
+        public static MemoryInfo GetMemoryInfo()
         {
             MEMORY_INFO memInfo = new MEMORY_INFO();
             MEMORYSTATUSEX memEx = new MEMORYSTATUSEX();
@@ -62,9 +62,9 @@ namespace ServerMonitor.Monitors
             GlobalMemoryStatusEx(ref memEx);
             GlobalMemoryStatus(ref memInfo);
             MemoryInfo memoryInfo = new MemoryInfo();
-            memoryInfo.memoryLoad = memInfo.dwMemoryLoad;
-            memoryInfo.availPhys = memInfo.dwAvailPhys;
-            memoryInfo.totalPhys = memInfo.dwTotalPhys;
+            memoryInfo.MemoryLoad = memInfo.dwMemoryLoad;
+            memoryInfo.AvailPhys = memInfo.dwAvailPhys;
+            memoryInfo.TotalPhys = memInfo.dwTotalPhys;
             return memoryInfo;
         }
         /// <summary>

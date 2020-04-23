@@ -49,7 +49,7 @@ namespace WebsiteServiceClient.Utils
             //fs.Dispose();
 
             SharpCompress.Archives.ArchiveFactory.WriteToDirectory(zipFile, dir);
-       
+
 
             var files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
 
@@ -153,7 +153,7 @@ namespace WebsiteServiceClient.Utils
         public static void FileBackup(WebsiteInfo websiteInfo)
         {
             if (websiteInfo.UseBackup.ToLower() == "true") {
-                var backupFileName = "";
+                string backupFileName;
                 if (websiteInfo.BackupRate.ToLower() == "day") {
                     backupFileName = Path.Combine(websiteInfo.BackupFolder, websiteInfo.Name + DateTime.Now.ToString("_yyyyMMdd") + ".zip");
                 } else if (websiteInfo.BackupRate.ToLower() == "hour") {

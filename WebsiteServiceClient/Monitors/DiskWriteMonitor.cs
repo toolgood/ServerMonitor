@@ -9,7 +9,7 @@ namespace WebsiteServiceClient.Monitors
     public sealed class DiskWriteMonitor
     {
         private static readonly DiskWriteMonitor instance = new DiskWriteMonitor();
-        private PerformanceCounter counter;
+        private readonly PerformanceCounter counter;
 
         private DiskWriteMonitor()
         {
@@ -18,12 +18,12 @@ namespace WebsiteServiceClient.Monitors
             System.Threading.Thread.Sleep(1000);
         }
 
-        public static DiskWriteMonitor getMonitor()
+        public static DiskWriteMonitor GetMonitor()
         {
             return instance;
         }
 
-        public static float getValue()
+        public static float GetValue()
         {
             return instance.counter.NextValue();
         }

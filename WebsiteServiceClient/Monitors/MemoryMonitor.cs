@@ -38,9 +38,9 @@ namespace WebsiteServiceClient.Monitors
         /// </summary>
         public class MemoryInfo
         {
-            public uint memoryLoad { get; set; }//返回00形式
-            public ulong totalPhys { get; set; } //以Bite为单位
-            public ulong availPhys { get; set; }//以Bite为单位
+            public uint MemoryLoad { get; set; }//返回00形式
+            public ulong TotalPhys { get; set; } //以Bite为单位
+            public ulong AvailPhys { get; set; }//以Bite为单位
         }
 
 
@@ -64,9 +64,9 @@ namespace WebsiteServiceClient.Monitors
             GlobalMemoryStatusEx(ref memEx);
             GlobalMemoryStatus(ref memInfo);
             MemoryInfo memoryInfo = new MemoryInfo();
-            memoryInfo.memoryLoad = memInfo.dwMemoryLoad;
-            memoryInfo.availPhys = memInfo.dwAvailPhys;
-            memoryInfo.totalPhys = memInfo.dwTotalPhys;
+            memoryInfo.MemoryLoad = memInfo.dwMemoryLoad;
+            memoryInfo.AvailPhys = memInfo.dwAvailPhys;
+            memoryInfo.TotalPhys = memInfo.dwTotalPhys;
             return memoryInfo;
         }
         /// <summary>

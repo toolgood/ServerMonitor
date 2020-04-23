@@ -10,7 +10,7 @@ namespace ServerMonitor.Monitors
     public sealed class NetworkSendMonitor
     {
         private static readonly NetworkSendMonitor instance = new NetworkSendMonitor();
-        private List<PerformanceCounter> counters = new List<PerformanceCounter>();
+        private readonly List<PerformanceCounter> counters = new List<PerformanceCounter>();
 
         private NetworkSendMonitor()
         {
@@ -29,12 +29,12 @@ namespace ServerMonitor.Monitors
             System.Threading.Thread.Sleep(1000);
         }
 
-        public static NetworkSendMonitor getMonitor()
+        public static NetworkSendMonitor GetMonitor()
         {
             return instance;
         }
 
-        public static float getValue()
+        public static float GetValue()
         {
             float value = 0;
             //return instance.counter.NextValue();
