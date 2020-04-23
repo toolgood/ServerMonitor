@@ -20,7 +20,9 @@ namespace IISUtil.Core
 					break;
 				case 7:
 				case 8:
-					instance = new UtilForIIS7();
+				case 9:
+				case 10:
+                    instance = new UtilForIIS7();
 					break;
 			}
 

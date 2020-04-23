@@ -6,6 +6,7 @@ using System.Text;
 using IISOle;
 
 using IISUtil.Entity;
+using ServerMonitor.Datas;
 
 namespace IISUtil.Core
 {
@@ -628,5 +629,10 @@ namespace IISUtil.Core
 			}
 			catch { }
 		}
-	}
+
+        public List<SiteInfo> GetSites()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

@@ -15,7 +15,7 @@ namespace ServerMonitor
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var monitorInfo = MonitorUtil.GetMachineMonitorInfo();
-
+            var sites = MonitorUtil.GetSiteInfos();
 
 
         }

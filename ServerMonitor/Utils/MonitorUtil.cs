@@ -1,4 +1,6 @@
-﻿using ServerMonitor.Monitors;
+﻿using IISUtil.Core;
+using ServerMonitor.Datas;
+using ServerMonitor.Monitors;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ namespace ServerMonitor.Utils
 {
     public class MonitorUtil
     {
-        //private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        #region 获取机器信息
         public static MachineMonitorInfo GetMachineMonitorInfo()
         {
             MachineMonitorInfo info = new MachineMonitorInfo();
@@ -55,50 +57,54 @@ namespace ServerMonitor.Utils
             Thread thread8 = new Thread(delegate () { GetNetworkSend(ref info); });
             thread8.Start();
             listThread.Add(thread8);
-
-
-            foreach (Thread thread in listThread) {
+            foreach (Thread thread in listThread)
+            {
                 thread.Join();
             }
-            foreach (Thread thread in listThread) {
+            foreach (Thread thread in listThread)
+            {
                 thread.Abort();
             }
             return info;
         }
- 
 
         private static void GetCpu(ref MachineMonitorInfo info)
         {
-            lock (info) {
+            lock (info)
+            {
                 info.CpuUsage = CPUMonitor.getValue();
             }
         }
         private static void GetCpuCount(ref MachineMonitorInfo info)
         {
-            lock (info) {
+            lock (info)
+            {
                 info.CoreNumber = ProcessorCountMonitor.getValue();
             }
         }
         private static void GetMenoryAvaliable(ref MachineMonitorInfo info)
         {
-            lock (info) {
+            lock (info)
+            {
                 info.MemoryAvailable = (MemoryMonitor.getMemoryInfo().availPhys / (1024 * 1024 * 1024));
             }
         }
         private static void GetMenoryTotal(ref MachineMonitorInfo info)
         {
-            lock (info) {
+            lock (info)
+            {
                 info.PhysicalMemory = (MemoryMonitor.getMemoryInfo().totalPhys / (1024 * 1024 * 1024));
             }
         }
-
         private static void GetHardDisk(ref MachineMonitorInfo info)
         {
-            lock (info) {
+            lock (info)
+            {
                 info.HardDisks = new List<HardDiskInfo>();
 
                 System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
-                foreach (System.IO.DriveInfo drive in drives) {
+                foreach (System.IO.DriveInfo drive in drives)
+                {
                     if (drive.IsReady == false) { continue; }
                     if (drive.DriveType == System.IO.DriveType.Removable) { continue; }
                     if (drive.DriveType == System.IO.DriveType.CDRom) { continue; }
@@ -114,90 +120,44 @@ namespace ServerMonitor.Utils
                 }
             }
         }
-        // 单kb
-        public static void GetDiskRead(ref MachineMonitorInfo info)
+        private static void GetDiskRead(ref MachineMonitorInfo info)
         {
-            lock (info) {
-                info.diskReadData = (int)((DiskReadMonitor.getValue()) / 1024);
+            lock (info)
+            {
+                info.DiskReadData = (int)((DiskReadMonitor.getValue()) / 1024);
             }
         }
-
-        // 单位Kb
-        public static void GetDiskWrite(ref MachineMonitorInfo info)
+        private static void GetDiskWrite(ref MachineMonitorInfo info)
         {
-            lock (info) {
-                info.diskWriteData = (int)((DiskWriteMonitor.getValue()) / 1024);
+            lock (info)
+            {
+                info.DiskWriteData = (int)((DiskWriteMonitor.getValue()) / 1024);
             }
         }
-        // 单位Kb
-        public static void GetNetworkReceive(ref MachineMonitorInfo info)
+        private static void GetNetworkReceive(ref MachineMonitorInfo info)
         {
-            lock (info) {
-                info.networkReceiveData = (int)((NetworkReceiveMonitor.getValue()) / 1024);
+            lock (info)
+            {
+                info.NetworkReceiveData = (int)((NetworkReceiveMonitor.getValue()) / 1024);
             }
         }
-
-        // 单位Kb
-        public static void GetNetworkSend(ref MachineMonitorInfo info)
+        private static void GetNetworkSend(ref MachineMonitorInfo info)
         {
-            lock (info) {
-                info.networkSendData = (int)((NetworkSendMonitor.getValue()) / 1024);
+            lock (info)
+            {
+                info.NetworkSendData = (int)((NetworkSendMonitor.getValue()) / 1024);
             }
         }
+        #endregion
 
-    }
- 
-
-    [Serializable]
-    public class MachineMonitorInfo
-    {
-        /// <summary>
-        /// CPU 使用率
-        /// </summary>
-        public float CpuUsage { get; set; }
-        /// <summary>
-        /// 核心数
-        /// </summary>
-        public int CoreNumber { get; set; }
-        /// <summary>
-        /// 可用内存 MB
-        /// </summary>
-        public float MemoryAvailable { get; set; }
-        /// <summary>
-        /// 物理内存 MB
-        /// </summary>
-        public float PhysicalMemory { get; set; }
-
-        public List<HardDiskInfo> HardDisks { get; set; }
-
-        public int diskReadData { get; set; }
-        public int diskWriteData { get; set; }
-        public int networkReceiveData { get; set; }
-        public int networkSendData { get; set; }
-
-        public override string ToString()
+        #region GetSiteInfos
+        public static List<SiteInfo> GetSiteInfos()
         {
-            return $"CPU:{CoreNumber}核，使用率{CpuUsage:0.00}%，可用内存{MemoryAvailable:0.00}GB，总共内存{PhysicalMemory:0.00}GB";
+            var sites = UtilFactory.GetUtil().GetSites();
+            return sites;
         }
 
-    }
-    public class HardDiskInfo
-    {
-        public string Name { get; set; }
-        /// <summary>
-        /// 硬盘可用空间 MB
-        /// </summary>
-        public float FreeSpace { get; set; }
-
-        /// <summary>
-        /// 硬盘空间 MB
-        /// </summary>
-        public float Space { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Name}盘,可用{FreeSpace:0.00}GB,总共{Space:0.00}GB";
-        }
+        #endregion
     }
 
 

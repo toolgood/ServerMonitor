@@ -11,9 +11,6 @@ namespace ServerMonitor
     {
         static void Main(string[] args)
         {
-            _ = new PerformanceCounterListener();
-            Console.Read();
-
             var rc = HostFactory.Run(x => {
                 x.Service<MainService>(s => {
                     s.ConstructUsing(name => new MainService());

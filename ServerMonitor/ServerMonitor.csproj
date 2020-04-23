@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net46</TargetFrameworks>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
@@ -28,7 +28,10 @@
       <HintPath>..\libs\Interop.IISOle.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Administration">
-      <HintPath>..\libs\Microsoft.Web.Administration.dll</HintPath>
+      <HintPath>C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Management">
+      <HintPath>C:\Windows\System32\inetsrv\Microsoft.Web.Management.dll</HintPath>
     </Reference>
   </ItemGroup>
  
