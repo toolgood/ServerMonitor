@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using Microsoft.Web.Administration;
 
-using IISUtil.Entity;
+using IISUtils.Entity;
 using ServerMonitor.Datas;
 
-namespace IISUtil.Core
+namespace IISUtils.Core
 {
     /// <summary>
     /// IIS7工具类(IIS8适用)
@@ -278,7 +278,14 @@ namespace IISUtil.Core
 								mimes.AddAt(0, mimeTypeSection);
 								*/
                                 string path = Path.Combine(physicalPath, "web.config");
-                                File.WriteAllText(path, IISResource.ResourceManager.GetString("webconfig"), Encoding.UTF8);
+                                File.WriteAllText(path, @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<configuration>
+    <system.webServer>
+        <staticContent>
+            <mimeMap fileExtension="".*"" mimeType=""application/octet-stream"" />
+        </staticContent>
+    </system.webServer>
+</configuration>", Encoding.UTF8);
                             }
 
                             server.CommitChanges();
@@ -644,16 +651,29 @@ namespace IISUtil.Core
                     ServerAutoStart = site.ServerAutoStart,
                     AppPoolName = site.ApplicationDefaults.ApplicationPoolName,
                     SiteState = (SiteState)(int)site.State,
+                    PhysicalPath = site.Applications["/"].VirtualDirectories["/"].PhysicalPath
 
                 };
+                // s.Pool = site.Applications["/"].ApplicationPoolName;
                 var appPool = server.ApplicationPools.Where(q => q.Name == siteInfo.AppPoolName).FirstOrDefault();
-                if (appPool!=null)
+                if (appPool != null)
                 {
                     siteInfo.AppPoolState = (SiteState)(int)appPool.State;
                 }
                 siteInfo.Bindings = new List<SiteBinding>();
                 foreach (Binding item in site.Bindings)
                 {
+                    string url = item.Protocol + "://";
+                    if (item.EndPoint.Address.ToString() == "0.0.0.0")
+                    {
+                        url += item.Host + ":" + item.EndPoint.Port;
+                    }
+                    else
+                    {
+                        url += item.EndPoint.Address.ToString() + ":" + item.EndPoint.Port;
+                    }
+                    //s.List_url.Add(url);
+
                     SiteBinding siteBinding = new SiteBinding() {
                         BindingInformation = item.BindingInformation,
                         Protocol = item.Protocol,
@@ -664,7 +684,7 @@ namespace IISUtil.Core
                 }
                 siteInfos.Add(siteInfo);
             }
- 
+
             return siteInfos;
         }
 

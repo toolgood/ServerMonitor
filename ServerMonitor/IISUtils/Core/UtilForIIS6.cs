@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using IISOle;
 
-using IISUtil.Entity;
+using IISUtils.Entity;
 using ServerMonitor.Datas;
 
-namespace IISUtil.Core
+namespace IISUtils.Core
 {
 	/// <summary>
 	/// IIS6工具类

@@ -10,6 +10,7 @@ namespace ServerMonitor.Datas
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string PhysicalPath { get; set; }
         public bool ServerAutoStart { get; set; }
         public string AppPoolName { get; set; }
         public SiteState SiteState { get; set; }

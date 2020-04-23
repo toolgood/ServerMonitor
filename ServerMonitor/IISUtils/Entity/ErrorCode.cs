@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IISUtil.Entity
+namespace IISUtils.Entity
 {
 	public class ErrorCode
 	{
