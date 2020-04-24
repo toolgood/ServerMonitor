@@ -1,10 +1,13 @@
+using System;
+using System.Runtime.InteropServices;
+
 namespace WebsiteServiceClient.Utils
 {
     public class TimeUtil
     {
         //设置系统时间的API函数
         [DllImport("Kernel32.dll")]
-        static extern bool SetSystemTime(ref SystemTime sysTime );
+        static extern bool SetSystemTime(ref SystemTime sysTime);
         [DllImport("Kernel32.dll")]
         static extern bool SetLocalTime(ref SystemTime sysTime);
         [DllImport("Kernel32.dll")]
@@ -14,7 +17,7 @@ namespace WebsiteServiceClient.Utils
 
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct SYSTEMTIME
+        private struct SystemTime
         {
             public short year;
             public short month;
@@ -32,15 +35,16 @@ namespace WebsiteServiceClient.Utils
         /// <returns>返回系统时间设置状态，true为成功，false为失败</returns>
         public static bool SetDate(DateTime dt)
         {
-            SYSTEMTIME st;
-            st.year = (short)dt.Year;
-            st.month = (short)dt.Month;
-            st.dayOfWeek = (short)dt.DayOfWeek;
-            st.day = (short)dt.Day;
-            st.hour = (short)dt.Hour;
-            st.minute = (short)dt.Minute;
-            st.second = (short)dt.Second;
-            st.milliseconds = (short)dt.Millisecond;
+            SystemTime st = new SystemTime {
+                year = (short)dt.Year,
+                month = (short)dt.Month,
+                dayOfWeek = (short)dt.DayOfWeek,
+                day = (short)dt.Day,
+                hour = (short)dt.Hour,
+                minute = (short)dt.Minute,
+                second = (short)dt.Second,
+                milliseconds = (short)dt.Millisecond
+            };
             bool rt = SetLocalTime(ref st);
             return rt;
         }
