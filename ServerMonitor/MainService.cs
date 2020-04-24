@@ -1,4 +1,6 @@
-﻿using ServerMonitor.Utils;
+﻿using ServerMonitor.Monitors;
+using ServerMonitor.Utils;
+using System.Linq;
 using System.Timers;
 
 namespace ServerMonitor
@@ -16,8 +18,10 @@ namespace ServerMonitor
         {
             var monitorInfo = MonitorUtil.GetMachineMonitorInfo();
             var sites = MonitorUtil.GetSiteInfos();
-
-
+            ProcessMonitor.Init();
+            ProcessMonitor.UpdateProcessList();
+            var pl = ProcessMonitor.ProcessList;
+            var pl2 = pl.ToList().OrderByDescending(q => q.CpuUsage).ToList();
         }
 
         public void Start() { _timer.Start(); Timer_Elapsed(_timer, null); }
