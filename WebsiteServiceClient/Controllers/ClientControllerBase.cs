@@ -8,12 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace WebsiteServiceClient.Controllers
 {
-    public class HomeController : Controller
+    public abstract class ClientControllerBase : Controller
     {
-        public IActionResult Index()
-        {
-            return Ok();
-        }
+ 
 
 
         

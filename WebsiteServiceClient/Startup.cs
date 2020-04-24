@@ -32,8 +32,8 @@ namespace WebsiteServiceClient
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 options.SerializerSettings.TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple;
-                options.SerializerSettings.Converters.Add(new JsonCustomDoubleConvert());// jsonĞòÁĞ»¯Ê±£¬ ·ÀÖ¹double£¬Ä©Î²³öÏÖĞ¡Êıµã¸¡¶¯,
-                options.SerializerSettings.Converters.Add(new JsonCustomDoubleNullConvert());// jsonĞòÁĞ»¯Ê±£¬ ·ÀÖ¹double£¬Ä©Î²³öÏÖĞ¡Êıµã¸¡¶¯,
+                options.SerializerSettings.Converters.Add(new JsonCustomDoubleConvert());// jsonåºåˆ—åŒ–æ—¶ï¼Œ é˜²æ­¢doubleï¼Œæœ«å°¾å‡ºç°å°æ•°ç‚¹æµ®åŠ¨,
+                options.SerializerSettings.Converters.Add(new JsonCustomDoubleNullConvert());// jsonåºåˆ—åŒ–æ—¶ï¼Œ é˜²æ­¢doubleï¼Œæœ«å°¾å‡ºç°å°æ•°ç‚¹æµ®åŠ¨,
             });
             services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
         }
@@ -58,7 +58,7 @@ namespace WebsiteServiceClient
             public override double? Create(Type objectType) { return null; }
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) { return reader.Value; }
             /// <summary>
-            /// ÖØÔØĞòÁĞ»¯·½·¨
+            /// é‡è½½åºåˆ—åŒ–æ–¹æ³•
             /// </summary>
             /// <param name="writer"></param>
             /// <param name="value"></param>
@@ -80,7 +80,7 @@ namespace WebsiteServiceClient
             public override double Create(Type objectType) { return 0.0; }
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) { return reader.Value; }
             /// <summary>
-            /// ÖØÔØĞòÁĞ»¯·½·¨
+            /// é‡è½½åºåˆ—åŒ–æ–¹æ³•
             /// </summary>
             /// <param name="writer"></param>
             /// <param name="value"></param>

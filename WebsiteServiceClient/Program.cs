@@ -22,8 +22,8 @@ namespace WebsiteServiceClient
         public static void Main(string[] args)
         {
             var rc = HostFactory.Run(x => {
-                x.SetDisplayName("ÍøÕ¾·şÎñ¿Í»§¶Ë");
-                x.SetDescription("ÍøÕ¾·şÎñ¿Í»§¶Ë");
+                x.SetDisplayName("ç½‘ç«™æœåŠ¡å®¢æˆ·ç«¯");
+                x.SetDescription("ç½‘ç«™æœåŠ¡å®¢æˆ·ç«¯");
                 x.SetServiceName("WebsiteServiceClient");
 
                 x.Service<MainService>(s => {
