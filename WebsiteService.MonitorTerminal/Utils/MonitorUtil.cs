@@ -59,9 +59,9 @@ namespace WebsiteService.MonitorTerminal.Utils
             foreach (Thread thread in listThread) {
                 thread.Join();
             }
-            foreach (Thread thread in listThread) {
-                thread.Abort();
-            }
+            //foreach (Thread thread in listThread) {
+            //    thread.Abort();
+            //}
             return info;
         }
 
