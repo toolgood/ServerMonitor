@@ -1,0 +1,68 @@
+﻿打开注册表【WIN+R】快捷键，然后输入【regedit】打开。然后根据
+路径：HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Terminal Server/Wds/rdpwd/Tds/tcp。
+在右面找到PortNamber，其默认值是3389，修改成所我们自己的的端口(2000-65535间选择)即可，这里我们以8899为例，注意使用十进制。见下图：
+
+
+
+根据路径：HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Terminal Server/WinStations/RDP-Tcp。
+然后找到PortNumber修改成端口8899，注意一样使用十进制。如下图：
+
+
+10 映射远程共享: 
+net use z: \\IP\baby 
+此命令将共享名为baby的共享资源映射到z盘 
+
+11 删除共享映射 
+net use c: /del 删除映射的c盘，其他盘类推 
+net use * /del /y删除全部 
+
+12 向远程主机复制文件 
+copy \路径\srv.exe \\IP\共享目录名，如： 
+copy ccbirds.exe \\*.*.*.*\c 即将当前目录下的文件复制到对方c盘内 
+
+
+连接远程地址
+
+        public bool ConnectState(string path, string userName, string passWord)
+        {
+            bool Flag = false;
+            Process proc = new Process();
+            try {
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.RedirectStandardInput = true;
+                proc.StartInfo.RedirectStandardOutput = true;
+                proc.StartInfo.RedirectStandardError = true;
+                proc.StartInfo.CreateNoWindow = true;
+                proc.Start();
+                string dosLine = @"net use " + path + " /User:" + userName + " " + passWord + " /PERSISTENT:YES";
+                proc.StandardInput.WriteLine(dosLine);
+                proc.StandardInput.WriteLine("exit");
+                while (!proc.HasExited) {
+                    proc.WaitForExit(1000);
+                }
+                string errormsg = proc.StandardError.ReadToEnd();
+                proc.StandardError.Close();
+                if (string.IsNullOrEmpty(errormsg)) {
+                    Flag = true;
+                //} else {
+                    //throw new Exception(errormsg);
+                }
+            } catch (Exception ex) {
+                //throw ex;
+            } finally {
+                proc.Close();
+                proc.Dispose();
+            }
+            return Flag;
+        }
+
+		  public void Get_Share(string remotepath, string localpath, string username, string password)
+  {
+   Process.Start("net"," use "+localpath+" "+remotepath+" "+password+" /user:"+username);
+  }
+
+  public void Break_Share(string localpath)
+  {
+   Process.Start("net"," use "+localpath+" /delete");
+  }
