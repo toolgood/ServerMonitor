@@ -1,18 +1,13 @@
-﻿using ServerMonitor.Datas;
-using ServerMonitor.Monitors;
-using ServerMonitor.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Management;
 using System.Threading;
 using Topshelf;
 
 namespace ServerMonitor
 {
-    class Program
+    internal class Program
     {
         public class ProcessMonitorItem : IDisposable
         {
@@ -47,7 +42,7 @@ namespace ServerMonitor
                 {
                     using (PerformanceCounter cnt = new PerformanceCounter("Process", "ID Process", instance, true))
                     {
-                        if ((int)cnt.RawValue == pid)
+                        if ((int) cnt.RawValue == pid)
                         {
                             return instance;
                         }
@@ -55,7 +50,7 @@ namespace ServerMonitor
                 }
                 throw new Exception("Could not find performance counter instance name for current process. This is truly strange ...");
             }
- 
+
             public void Init()
             {
                 if (WorkingSetPrivate != null)
@@ -96,8 +91,19 @@ namespace ServerMonitor
             }
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_PerfProc_Process");
+            var managementObjectCollection = searcher.Get();
+
+            List<string> ls = new List<string>();
+            foreach (ManagementObject item in managementObjectCollection)
+            {
+                var stringCPU = item.Properties["PercentProcessorTime"].Value.ToString();
+                ls.Add(stringCPU);
+            }
+
+
             //获取当前进程对象
             Process cur = Process.GetCurrentProcess();
             ProcessMonitorItem processMonitor = new ProcessMonitorItem(cur);
@@ -156,8 +162,10 @@ namespace ServerMonitor
             Console.ReadLine();
 
 
-            var rc = HostFactory.Run(x => {
-                x.Service<MainService>(s => {
+            var rc = HostFactory.Run(x =>
+            {
+                x.Service<MainService>(s =>
+                {
                     s.ConstructUsing(name => new MainService());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
@@ -168,7 +176,7 @@ namespace ServerMonitor
                 x.SetDisplayName("ServerMonitor");
                 x.SetServiceName("ServerMonitor");
             });
-            var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
+            var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());
             Environment.ExitCode = exitCode;
         }
     }

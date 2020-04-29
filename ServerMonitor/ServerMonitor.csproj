@@ -27,6 +27,9 @@
     <Reference Include="Interop.IISOle">
       <HintPath>..\libs\Interop.IISOle.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.NetFwTypeLib">
+      <HintPath>..\libs\Interop.NetFwTypeLib.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Administration">
       <HintPath>C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
     </Reference>
