@@ -106,6 +106,13 @@ namespace ServerMonitor
 
         private static void Main(string[] args)
         {
+            var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
+            var pn =(int) key.GetValue("PortNumber");
+            key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp");
+            pn = (int) key.GetValue("PortNumber");
+            var kid = key.GetValueKind("PortNumber");
+            var name = key.GetValueNames();
+            // mstsc
             List<SoftwareInfo> softwareInfos = new List<SoftwareInfo>();
             ShowAllSoftwaresName(softwareInfos);
         }
@@ -131,7 +138,7 @@ namespace ServerMonitor
                     info.Publisher = subkey.GetValue("Publisher") as string;
                     info.InstallDate = subkey.GetValue("InstallDate") as string;
                     info.InstallLocation = subkey.GetValue("InstallLocation") as string ?? subkey.GetValue("InstallDir") as string;
-                    if (info.Icon!=null && info.Icon.StartsWith("\""))
+                    if (info.Icon != null && info.Icon.StartsWith("\""))
                     {
                         info.Icon = info.Icon.Trim('"');
                     }
