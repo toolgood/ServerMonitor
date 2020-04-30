@@ -9,7 +9,7 @@ using WebsiteService.MonitorTerminal.Monitors;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class MonitorUtil
+    public static class MonitorUtil
     {
         #region 获取机器信息
         public static MachineMonitorInfo GetMachineMonitorInfo()

@@ -93,93 +93,68 @@ namespace ServerMonitor
             }
         }
 
+        public class SoftwareInfo
+        {
+            public string Name { get; set; }//DisplayName
+            public string Icon { get; set; }//DisplayIcon
+            public string Version { get; set; }//DisplayVersion
+            public string InstallLocation { get; set; } //InstallLocation  InstallDir 
+            public string Publisher { get; set; }//Publisher   Microsoft Corporation
+            public string InstallDate { get; set; }//InstallDate 20191122
+
+        }
+
         private static void Main(string[] args)
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_PerfProc_Process");
-            var managementObjectCollection = searcher.Get();
+            List<SoftwareInfo> softwareInfos = new List<SoftwareInfo>();
+            ShowAllSoftwaresName(softwareInfos);
+        }
 
-            List<string> ls = new List<string>();
-            foreach (ManagementObject item in managementObjectCollection)
+
+        public static void DisplayInstalledApps(RegistryKey key, List<SoftwareInfo> softwareInfos)
+        {
+            string displayName;
+            if (key != null)
             {
-                var stringCPU = item.Properties["PercentProcessorTime"].Value.ToString();
-                ls.Add(stringCPU);
-            }
-
-
-            //获取当前进程对象
-            Process cur = Process.GetCurrentProcess();
-            ProcessMonitorItem processMonitor = new ProcessMonitorItem(cur);
-            processMonitor.Init();
-            Thread.Sleep(200);
-            while (true)
-            {
-                processMonitor.UpdateInfo();
-                Console.WriteLine("{0}:{1}  {2:N}MB CPU使用率：{3}%", processMonitor.ProcessName, "私有工作集    ", processMonitor.MemoryUsage, processMonitor.CpuUsage);
-
-
-                Thread.Sleep(1000);
-            }
-
-
-            PerformanceCounter curpcp = new PerformanceCounter("Process", "Working Set - Private", cur.ProcessName);
-
-            PerformanceCounter curpc = new PerformanceCounter("Process", "Working Set", cur.ProcessName);
-            PerformanceCounter curtime = new PerformanceCounter("Process", "% Processor Time", cur.ProcessName);
-
-            //上次记录CPU的时间
-            TimeSpan prevCpuTime = TimeSpan.Zero;
-            //Sleep的时间间隔
-            int interval = 1000;
-
-            PerformanceCounter totalcpu = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-
-            //SystemInfo sys = new SystemInfo();
-            const int KB_DIV = 1024;
-            const int MB_DIV = 1024 * 1024;
-            const int GB_DIV = 1024 * 1024 * 1024;
-            while (true)
-            {
-                //第一种方法计算CPU使用率
-                //当前时间
-                TimeSpan curCpuTime = cur.TotalProcessorTime;
-                //计算
-                double value = (curCpuTime - prevCpuTime).TotalMilliseconds / interval / Environment.ProcessorCount * 100;
-                prevCpuTime = curCpuTime;
-
-                Console.WriteLine("{0}:{1}  {2:N}KB CPU使用率：{3}", cur.ProcessName, "工作集(进程类)", cur.WorkingSet64 / 1024, value);//这个工作集只是在一开始初始化，后期不变
-                Console.WriteLine("{0}:{1}  {2:N}KB CPU使用率：{3}", cur.ProcessName, "工作集        ", curpc.NextValue() / 1024, value);//这个工作集是动态更新的
-                //第二种计算CPU使用率的方法
-                Console.WriteLine("{0}:{1}  {2:N}KB CPU使用率：{3}%", cur.ProcessName, "私有工作集    ", curpcp.NextValue() / 1024, curtime.NextValue() / Environment.ProcessorCount);
-                //Thread.Sleep(interval);
-
-                //第一种方法获取系统CPU使用情况
-                Console.Write("\r系统CPU使用率：{0}%", totalcpu.NextValue());
-                //Thread.Sleep(interval);
-
-                //第二章方法获取系统CPU和内存使用情况
-                //Console.Write("\r系统CPU使用率：{0}%，系统内存使用大小：{1}MB({2}GB)", sys.CpuLoad, (sys.PhysicalMemory - sys.MemoryAvailable) / MB_DIV, (sys.PhysicalMemory - sys.MemoryAvailable) / (double)GB_DIV);
-                Thread.Sleep(interval);
-            }
-
-            Console.ReadLine();
-
-
-            var rc = HostFactory.Run(x =>
-            {
-                x.Service<MainService>(s =>
+                foreach (String keyName in key.GetSubKeyNames())
                 {
-                    s.ConstructUsing(name => new MainService());
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
-                });
-                x.RunAsLocalSystem();
+                    RegistryKey subkey = key.OpenSubKey(keyName);
+                    displayName = subkey.GetValue("DisplayName") as string;
+                    if (displayName == null) { continue; }
+                    if (softwareInfos.Any(q => q.Name == displayName)) continue;
+                    SoftwareInfo info = new SoftwareInfo();
+                    softwareInfos.Add(info);
 
-                x.SetDescription("ServerMonitor");
-                x.SetDisplayName("ServerMonitor");
-                x.SetServiceName("ServerMonitor");
-            });
-            var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());
-            Environment.ExitCode = exitCode;
+                    info.Name = displayName;
+                    info.Icon = subkey.GetValue("DisplayIcon") as string;
+                    info.Version = subkey.GetValue("DisplayVersion") as string;
+                    info.Publisher = subkey.GetValue("Publisher") as string;
+                    info.InstallDate = subkey.GetValue("InstallDate") as string;
+                    info.InstallLocation = subkey.GetValue("InstallLocation") as string ?? subkey.GetValue("InstallDir") as string;
+                    if (info.Icon!=null && info.Icon.StartsWith("\""))
+                    {
+                        info.Icon = info.Icon.Trim('"');
+                    }
+                }
+            }
+        }
+
+        public static void ShowAllSoftwaresName(List<SoftwareInfo> softwareInfos)
+        {
+            RegistryKey key;
+
+            // search in: CurrentUser
+            key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
+            DisplayInstalledApps(key, softwareInfos);
+            // search in: LocalMachine_32
+            key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
+            DisplayInstalledApps(key, softwareInfos);
+            // search in: CurrentUser_64
+            key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
+            DisplayInstalledApps(key, softwareInfos);
+            // search in: LocalMachine_64
+            key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
+            DisplayInstalledApps(key, softwareInfos);
         }
     }
     internal class Program2
@@ -246,6 +221,8 @@ namespace ServerMonitor
                 //MessageBox.Show(ex.Message);
             }
         }
+
+
 
         //private void btn_start_Click(object sender, EventArgs e)
         //{

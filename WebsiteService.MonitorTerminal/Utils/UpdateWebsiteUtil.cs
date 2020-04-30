@@ -3,25 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 //using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using WebsiteService.MonitorTerminal.Datas;
 using SharpCompress.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpCompress;
-using System.IO;
-using SharpCompress.Common;
-using System.Text.RegularExpressions;
 using SharpCompress.Compressors.Deflate;
 using SharpCompress.Writers.Zip;
+using WebsiteService.MonitorTerminal.Datas;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class UpdateWebsiteUtil
+    public static class UpdateWebsiteUtil
     {
         public static void RestoreFile(WebsiteInfo websiteInfo)
         {

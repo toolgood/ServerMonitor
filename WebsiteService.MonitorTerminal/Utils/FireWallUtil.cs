@@ -7,7 +7,7 @@ using NetFwTypeLib;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class FireWallUtil
+    public static class FireWallUtil
     {
         /// <summary>
         /// 添加防火墙例外端口

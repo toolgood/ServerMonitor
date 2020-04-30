@@ -8,7 +8,7 @@ namespace WebsiteService.MonitorTerminal.Utils
     /// <summary>
     /// HASH
     /// </summary>
-    public class HashUtil
+    public static class HashUtil
     {
         #region CRC8
         /// <summary>

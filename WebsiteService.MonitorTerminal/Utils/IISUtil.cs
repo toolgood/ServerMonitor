@@ -9,7 +9,7 @@ using WebsiteService.MonitorTerminal.Datas;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class IISUtil
+    public static class IISUtil
     {
         public static void ResetSite(string siteName)
         {

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class TimeUtil
+    public static class TimeUtil
     {
         //设置系统时间的API函数
         [DllImport("Kernel32.dll")]

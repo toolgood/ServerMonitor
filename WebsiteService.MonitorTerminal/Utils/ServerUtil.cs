@@ -9,7 +9,7 @@ namespace WebsiteService.MonitorTerminal.Utils
     /// <summary>
     ///  操作类
     /// </summary>
-    public class ServerUtil
+    public static class ServerUtil
     {
         /// <summary>
         /// 获取所有服务

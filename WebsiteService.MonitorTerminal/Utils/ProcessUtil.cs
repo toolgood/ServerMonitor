@@ -9,7 +9,7 @@ using WebsiteService.MonitorTerminal.Monitors;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
-    public class ProcessUtil
+    public static class ProcessUtil
     {
         public static List<ProcessInfo> GetProcessInfos()
         {
