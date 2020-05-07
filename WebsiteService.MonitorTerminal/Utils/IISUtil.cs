@@ -268,7 +268,7 @@ namespace WebsiteService.MonitorTerminal.Utils
         }
 
 
-        public List<SiteInfo> GetSites()
+        public static List<SiteInfo> GetSites()
         {
             List<SiteInfo> siteInfos = new List<SiteInfo>();
             var server = new ServerManager();//请使用管理员模式

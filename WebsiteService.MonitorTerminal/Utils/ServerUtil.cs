@@ -153,7 +153,7 @@ namespace WebsiteService.MonitorTerminal.Utils
         /// </summary>
         /// <param name="service"></param>
         /// <returns></returns>
-        public bool ResumeService(System.ServiceProcess.ServiceController service)
+        public static bool ResumeService(System.ServiceProcess.ServiceController service)
         {
             try {
                 if (service == null) return false;

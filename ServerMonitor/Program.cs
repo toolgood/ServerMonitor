@@ -106,6 +106,15 @@ namespace ServerMonitor
 
         private static void Main(string[] args)
         {
+            var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
+            archive.AddAllFromDirectory(path);
+
+            archive.SaveTo(Path.Combine(Path.GetDirectoryName(path), fileName), new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
+            {
+
+            });
+            archive.Dispose();
+
             var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
             var pn =(int) key.GetValue("PortNumber");
             key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp");
