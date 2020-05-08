@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Threading;
 using Microsoft.Win32;
+using SharpCompress.Archives;
 using Topshelf;
+using System.Text;
 
 namespace ServerMonitor
 {
@@ -107,11 +110,16 @@ namespace ServerMonitor
         private static void Main(string[] args)
         {
             var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
-            archive.AddAllFromDirectory(path);
+            var root = Path.GetDirectoryName(@"D:\Nlog\111");
+            archive.AddAllFromDirectory(@"D:\Nlog");
 
-            archive.SaveTo(Path.Combine(Path.GetDirectoryName(path), fileName), new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
+            archive.SaveTo(@"D:\1.zip", new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
             {
-
+                ArchiveEncoding=new SharpCompress.Common.ArchiveEncoding()
+                {
+                    Default= Encoding.UTF8,
+                    Forced= Encoding.UTF8,
+                 }
             });
             archive.Dispose();
 

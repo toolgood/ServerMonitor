@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -139,6 +140,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Ok();
         }
 
+        #region 删除 复制 移动 文件
         [HttpGet("File/DeleteFile")]
         public IActionResult DeleteFile(string path, long timestamp, string sign)
         {
@@ -212,7 +214,9 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 return StatusCode(500);
             }
         }
+        #endregion
 
+        #region 删除 复制 移动 文件夹
         [HttpGet("File/DeleteFolder")]
         public IActionResult DeleteFolder(string path, long timestamp, string sign)
         {
@@ -308,7 +312,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 CopyDirectory(dirs[j].FullName, target.FullName + @"\" + dirs[j].Name);
             }
-        }
+        } 
+        #endregion
 
 
         [HttpGet("File/GetImage")]
@@ -343,6 +348,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return PhysicalFile(path, "plan/text");
         }
 
+        #region 上传 下载 文件
         [HttpGet("File/DownloadFile")]
         public IActionResult DownloadFile(string path, long timestamp, string sign)
         {
@@ -374,7 +380,9 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             return PhysicalFile(path, "plan/text");
         }
-
+        #endregion
+        
+        #region 压缩 解压
         [HttpGet("File/ZipFile")]
         public IActionResult ZipFile(string path, string fileName, long timestamp, string sign)
         {
@@ -392,7 +400,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             archive.AddEntry(Path.GetFileName(path), new FileInfo(path));
             archive.SaveTo(Path.Combine(Path.GetDirectoryName(path), fileName), new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
             {
-
+                ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding() { Default = Encoding.UTF8, }
             });
             archive.Dispose();
 
@@ -408,17 +416,22 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
             }
-            if (System.IO.File.Exists(path) == false)
+            if (System.IO.Directory.Exists(path) == false)
             {
                 return StatusCode(500);
             }
-            //var di = new DirectoryInfo(path);
             var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
-            archive.AddAllFromDirectory(path);
-           
+            var rootLength = Path.GetDirectoryName(path).Length;
+            var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var key = file.Substring(rootLength + 1);
+                archive.AddEntry(key, new FileInfo(file));
+            }
+
             archive.SaveTo(Path.Combine(Path.GetDirectoryName(path), fileName), new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
             {
-
+                ArchiveEncoding = new SharpCompress.Common.ArchiveEncoding() { Default = Encoding.UTF8, }
             });
             archive.Dispose();
 
@@ -471,6 +484,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Ok();
         }
 
+        #endregion
 
     }
 }
