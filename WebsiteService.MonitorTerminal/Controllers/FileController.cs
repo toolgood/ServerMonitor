@@ -6,10 +6,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using SharpCompress.Archives;
 using WebsiteService.MonitorTerminal.Datas;
+using WebsiteService.MonitorTerminal.Mime;
 
 namespace WebsiteService.MonitorTerminal.Controllers
 {
@@ -26,7 +28,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
 
             List<Datas.FolderInfo> folderFileInfos = new List<Datas.FolderInfo>();
@@ -85,7 +87,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
 
             List<Datas.FolderInfo> folderFileInfos = new List<Datas.FolderInfo>();
@@ -130,11 +132,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             Process.Start(path);
             return Ok();
@@ -148,11 +150,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -161,7 +163,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
 
@@ -172,11 +174,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -186,7 +188,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
 
@@ -197,11 +199,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -211,12 +213,33 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
         #endregion
 
-        #region 删除 复制 移动 文件夹
+        #region 创建 删除 复制 移动 文件夹
+        [HttpGet("File/CreateFolder")]
+        public IActionResult CreateFolder(string path, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            try
+            {
+                System.IO.Directory.CreateDirectory(path);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(404);
+            }
+
+        }
+
         [HttpGet("File/DeleteFolder")]
         public IActionResult DeleteFolder(string path, long timestamp, string sign)
         {
@@ -224,11 +247,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.Directory.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -237,7 +260,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
 
@@ -248,11 +271,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.Directory.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -262,7 +285,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
 
@@ -273,11 +296,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.Directory.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             try
             {
@@ -288,7 +311,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
         }
 
@@ -312,7 +335,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 CopyDirectory(dirs[j].FullName, target.FullName + @"\" + dirs[j].Name);
             }
-        } 
+        }
         #endregion
 
 
@@ -323,11 +346,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             return PhysicalFile(path, "image/png");
         }
@@ -339,18 +362,16 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             return PhysicalFile(path, "plan/text");
         }
 
         #region 上传 下载 文件
-
-
 
         [HttpGet("File/DownloadFile")]
         public IActionResult DownloadFile(string path, long timestamp, string sign)
@@ -358,33 +379,48 @@ namespace WebsiteService.MonitorTerminal.Controllers
             if (IsSignParameter())
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(path)] = path.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
-            return PhysicalFile(path, "application/octet-stream");
+            var mime = new MimeMapper().GetMimeFromPath(path);
+            return PhysicalFile(path, mime,true);
         }
 
         [HttpGet("File/UploadFile")]
-        public IActionResult UploadFile(string path, long timestamp, string sign)
+        public async Task<IActionResult> UploadFile(IFormFile file, string path, long timestamp, string sign)
         {
             if (IsSignParameter())
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(file.FileName)] = file.FileName.ToString();
+                keys[nameof(path)] = path.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
-            if (System.IO.File.Exists(path) == false)
+            var fileName = file.FileName;
+            var filePath = Path.Combine(path, fileName);
+            if (!Directory.Exists(path))
             {
-
+                Directory.CreateDirectory(path);
             }
-            return PhysicalFile(path, "plan/text");
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.CreateNew))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                return Ok();
+            }
+            catch (Exception) { }
+            return StatusCode(404);
         }
         #endregion
-        
+
         #region 压缩 解压
         [HttpGet("File/ZipFile")]
         public IActionResult ZipFile(string path, string fileName, long timestamp, string sign)
@@ -393,11 +429,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
             archive.AddEntry(Path.GetFileName(path), new FileInfo(path));
@@ -417,11 +453,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.Directory.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
             var rootLength = Path.GetDirectoryName(path).Length;
@@ -448,11 +484,11 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (System.IO.File.Exists(path) == false)
             {
-                return StatusCode(500);
+                return StatusCode(404);
             }
             IArchive archive;
             if (string.IsNullOrEmpty(password))

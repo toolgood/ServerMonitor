@@ -21,7 +21,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             var r = IISUtil.GetSites();
             return Json(r);
@@ -35,7 +35,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(siteName)] = siteName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -45,7 +45,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         public IActionResult StopSite(string siteName, long timestamp, string sign)
@@ -55,7 +55,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(siteName)] = siteName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -65,7 +65,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         public IActionResult DeleteSite(string siteName, long timestamp, string sign)
@@ -75,7 +75,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(siteName)] = siteName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -85,7 +85,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         #endregion
@@ -99,7 +99,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(poolName)] = poolName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -109,7 +109,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         public IActionResult StopAppPool(string poolName, long timestamp, string sign)
@@ -119,7 +119,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(poolName)] = poolName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -129,7 +129,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         public IActionResult DeleteAppPool(string poolName, long timestamp, string sign)
@@ -139,13 +139,13 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(poolName)] = poolName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (IsSignParameter())
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -155,7 +155,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         #endregion

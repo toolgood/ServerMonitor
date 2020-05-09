@@ -21,7 +21,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(noticeUrl)] = noticeUrl;
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             if (string.IsNullOrEmpty(noticeUrl))
             {
@@ -44,7 +44,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(noticeUrl)] = noticeUrl;
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
 
             if (string.IsNullOrEmpty(noticeUrl))

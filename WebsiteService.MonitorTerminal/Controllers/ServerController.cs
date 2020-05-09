@@ -20,7 +20,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             var r = ServerUtil.GetAllServices();
             return Json(r);
@@ -35,7 +35,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(serviceName)] = serviceName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -45,7 +45,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (System.Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         }
 
         [HttpGet("Server/StartService")]
@@ -56,7 +56,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(serviceName)] = serviceName.ToString();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
             try
             {
@@ -66,7 +66,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             catch (System.Exception ex)
             {
             }
-            return StatusCode(500);
+            return StatusCode(404);
         } 
         #endregion
 

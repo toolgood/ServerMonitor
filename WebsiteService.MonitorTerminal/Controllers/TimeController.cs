@@ -22,7 +22,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
 
             return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -36,7 +36,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(newTime)] = newTime.ToString("yyyy-MM-dd HH:mm:ss");
                 keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
 
             TimeUtil.SetDate(newTime);
