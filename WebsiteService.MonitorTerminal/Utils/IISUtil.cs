@@ -1,10 +1,10 @@
-﻿using Microsoft.Web.Administration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
+using Microsoft.Web.Administration;
 using WebsiteService.MonitorTerminal.Datas;
 
 namespace WebsiteService.MonitorTerminal.Utils
@@ -33,8 +33,9 @@ namespace WebsiteService.MonitorTerminal.Utils
             ServerManager manager = new ServerManager();
 
             Site site = manager.Sites[siteName];
-
-            return site.Start().ToString();
+            var s = site.Start().ToString();
+            StartAppPool(site.ApplicationDefaults.ApplicationPoolName);
+            return s;
         }
 
         public static string GetSiteState(string siteName)
@@ -48,12 +49,15 @@ namespace WebsiteService.MonitorTerminal.Utils
 
         public static bool DoesExistSite(string siteName)
         {
-            try {
+            try
+            {
                 ServerManager manager = new ServerManager();
 
                 Site site = manager.Sites[siteName];
                 return site != null;
-            } catch {
+            }
+            catch
+            {
                 return false;
             }
         }
@@ -75,17 +79,21 @@ namespace WebsiteService.MonitorTerminal.Utils
 
         private static bool CreateIISDirectory(DirectoryInfo dirInfo)
         {
-            try {
+            try
+            {
                 DirectorySecurity security = new DirectorySecurity();
                 security.AddAccessRule(new FileSystemAccessRule("Everyone", FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
 
-                if (!dirInfo.Exists) {
+                if (!dirInfo.Exists)
+                {
                     dirInfo.Create();
                 }
 
                 // 设置Everyone权限
                 dirInfo.SetAccessControl(security);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 return false;
             }
             return true;
@@ -99,7 +107,8 @@ namespace WebsiteService.MonitorTerminal.Utils
         /// <param name="isClassic"></param>
         public static void CreateAppPool(string appPoolName, string version, bool isClassic)
         {
-            if (!DoesExistAppPool(appPoolName)) {
+            if (!DoesExistAppPool(appPoolName))
+            {
                 ServerManager iisManager = new ServerManager();
                 ApplicationPool appPool = iisManager.ApplicationPools.Add(appPoolName);
                 appPool.AutoStart = true;
@@ -129,9 +138,12 @@ namespace WebsiteService.MonitorTerminal.Utils
             ApplicationPool pool;
 
             pool = null;
-            try {
+            try
+            {
                 pool = manager.ApplicationPools[appPoolName];
-            } catch {
+            }
+            catch
+            {
             }
             manager.Dispose();
             return pool != null;
@@ -140,8 +152,10 @@ namespace WebsiteService.MonitorTerminal.Utils
 
         private static Application FindRootApplication(Site site)
         {
-            foreach (Application app in site.Applications) {
-                if (!string.IsNullOrEmpty(app.Path) && app.Path == "/") {
+            foreach (Application app in site.Applications)
+            {
+                if (!string.IsNullOrEmpty(app.Path) && app.Path == "/")
+                {
                     return app;
                 }
             }
@@ -153,7 +167,8 @@ namespace WebsiteService.MonitorTerminal.Utils
             ServerManager manager = new ServerManager();
 
             // 如站点存在，删除
-            if (DoesExistSite(siteName)) {
+            if (DoesExistSite(siteName))
+            {
                 DeleteSite(siteName);
             }
 
@@ -167,7 +182,8 @@ namespace WebsiteService.MonitorTerminal.Utils
             CreateAppPool(appPoolName, "v4.0", false);
             Site site = manager.Sites[siteName];
             Application rootApp = FindRootApplication(site);
-            if (rootApp != null) {
+            if (rootApp != null)
+            {
                 rootApp.ApplicationPoolName = appPoolName;
                 manager.CommitChanges();
             }
@@ -179,7 +195,8 @@ namespace WebsiteService.MonitorTerminal.Utils
 
         public static void CreateApplication(string siteName, string appName, string appPoolName, string baseFolder)
         {
-            if (!DoesExistAppPool(appPoolName)) {
+            if (!DoesExistAppPool(appPoolName))
+            {
                 CreateAppPool(appPoolName, "v4.0", false);
             }
 
@@ -199,7 +216,8 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static void StopAppPool(string poolName)
         {
             ServerManager manager = new ServerManager();
-            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping) {
+            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
+            {
                 manager.ApplicationPools[poolName].Stop();
             }
         }
@@ -207,11 +225,20 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static void StartAppPool(string poolName)
         {
             ServerManager manager = new ServerManager();
-            if (manager.ApplicationPools[poolName].State != ObjectState.Started && manager.ApplicationPools[poolName].State != ObjectState.Starting) {
+            if (manager.ApplicationPools[poolName].State != ObjectState.Started && manager.ApplicationPools[poolName].State != ObjectState.Starting)
+            {
                 manager.ApplicationPools[poolName].Start();
             }
         }
-
+        public static void DeleteAppPool(string poolName)
+        {
+            ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
+            {
+                manager.ApplicationPools[poolName].Stop();
+            }
+            manager.ApplicationPools.Remove(manager.ApplicationPools[poolName]);
+        }
         //public static void StopSitePools(string siteName)
         //{
         //    ServerManager manager = new ServerManager();
@@ -272,8 +299,10 @@ namespace WebsiteService.MonitorTerminal.Utils
         {
             List<SiteInfo> siteInfos = new List<SiteInfo>();
             var server = new ServerManager();//请使用管理员模式
-            foreach (Site site in server.Sites) {
-                SiteInfo siteInfo = new SiteInfo() {
+            foreach (Site site in server.Sites)
+            {
+                SiteInfo siteInfo = new SiteInfo()
+                {
                     Name = site.Name,
                     Id = site.Id,
                     ServerAutoStart = site.ServerAutoStart,
@@ -284,15 +313,20 @@ namespace WebsiteService.MonitorTerminal.Utils
                 };
                 // s.Pool = site.Applications["/"].ApplicationPoolName;
                 var appPool = server.ApplicationPools.Where(q => q.Name == siteInfo.AppPoolName).FirstOrDefault();
-                if (appPool != null) {
+                if (appPool != null)
+                {
                     siteInfo.AppPoolState = appPool.State.ToString();
                 }
                 siteInfo.Bindings = new List<string>();
-                foreach (Binding item in site.Bindings) {
+                foreach (Binding item in site.Bindings)
+                {
                     string url = item.Protocol + "://";
-                    if (item.EndPoint.Address.ToString() == "0.0.0.0") {
+                    if (item.EndPoint.Address.ToString() == "0.0.0.0")
+                    {
                         url += item.Host + ":" + item.EndPoint.Port;
-                    } else {
+                    }
+                    else
+                    {
                         url += item.EndPoint.Address.ToString() + ":" + item.EndPoint.Port;
                     }
                     siteInfo.Bindings.Add(url);

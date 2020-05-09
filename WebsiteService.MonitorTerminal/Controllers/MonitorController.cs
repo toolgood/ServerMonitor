@@ -16,19 +16,22 @@ namespace WebsiteService.MonitorTerminal.Controllers
         [HttpGet("Monitor/GetMonitorInfo")]
         public IActionResult GetMonitorInfo(string noticeUrl, long timestamp, string sign)
         {
-            if (IsSignParameter()) {
+            if (IsSignParameter())
+            {
                 SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
                 keys[nameof(noticeUrl)] = noticeUrl;
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
             }
-            if (string.IsNullOrEmpty(noticeUrl)) {
+            if (string.IsNullOrEmpty(noticeUrl))
+            {
                 var pis = MonitorUtil.GetMachineMonitorInfo();
                 return Json(pis);
             }
-            Task.Run(() => {
+            Task.Run(async () =>
+            {
                 var pis = MonitorUtil.GetMachineMonitorInfo();
-                SendToNoticeUrl(noticeUrl, pis);
+                await SendToNoticeUrl(noticeUrl, pis);
             });
             return Ok();
         }
@@ -49,10 +52,10 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 var pis = ProcessUtil.GetProcessInfos();
                 return Json(pis);
             }
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 var pis = ProcessUtil.GetProcessInfos();
-                SendToNoticeUrl(noticeUrl, pis);
+                await SendToNoticeUrl(noticeUrl, pis);
             });
             return Ok();
         }

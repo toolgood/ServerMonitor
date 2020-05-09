@@ -35,7 +35,6 @@ namespace WebsiteService.MonitorTerminal
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseMvc();
         }
     }
