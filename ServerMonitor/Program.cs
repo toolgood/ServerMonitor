@@ -109,6 +109,10 @@ namespace ServerMonitor
 
         private static void Main(string[] args)
         {
+            string unexpandedPath = "%SystemRoot%\\bin\\texturepreviewer.exe -2 -4";
+         var FileName = Environment.ExpandEnvironmentVariables(unexpandedPath);
+
+            var r=    Path.GetFullPath(@"%SystemRoot%\System32\svchost.exe");
             var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
             var root = Path.GetDirectoryName(@"D:\Nlog\111");
             archive.AddAllFromDirectory(@"D:\Nlog");

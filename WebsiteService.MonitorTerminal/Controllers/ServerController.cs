@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using WebsiteService.MonitorTerminal.Utils;
@@ -12,16 +13,30 @@ namespace WebsiteService.MonitorTerminal.Controllers
         {
         }
 
-        [HttpPost]
+        [HttpGet("Server/GetServiceList")]
         public IActionResult GetServiceList(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             var r = ServerUtil.GetAllServices();
             return Json(r);
         }
 
-        [HttpPost]
+        #region 服务 启动 停止
+        [HttpGet("Server/StopService")]
         public IActionResult StopService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(serviceName)] = serviceName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 ServerUtil.StopService(serviceName);
@@ -33,9 +48,16 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(500);
         }
 
-        [HttpPost]
+        [HttpGet("Server/StartService")]
         public IActionResult StartService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(serviceName)] = serviceName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 ServerUtil.StartService(serviceName);
@@ -45,7 +67,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
             }
             return StatusCode(500);
-        }
+        } 
+        #endregion
 
         [HttpPost]
         public IActionResult UploadService(string serviceName, long timestamp, string sign)

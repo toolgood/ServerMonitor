@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "File/GetFolders",
+      "launchUrl": "Server/GetServiceList",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "WebsiteService.MonitorTerminal": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "File/GetFolders",
+      "launchUrl": "Server/GetServiceList",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

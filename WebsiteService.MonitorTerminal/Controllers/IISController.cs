@@ -17,12 +17,26 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
         public IActionResult GetSiteList(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             var r = IISUtil.GetSites();
             return Json(r);
         }
 
+        #region 站点 启动 暂停 删除
         public IActionResult StartSite(string siteName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.StartSite(siteName);
@@ -36,6 +50,13 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
         public IActionResult StopSite(string siteName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.StartSite(siteName);
@@ -47,13 +68,15 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(500);
         }
 
-        public IActionResult CreateSite(long timestamp, string sign)
-        {
-            return View();
-        }
-
         public IActionResult DeleteSite(string siteName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.DeleteSite(siteName);
@@ -65,9 +88,19 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(500);
         }
 
+        #endregion
+
+        #region 应用程序池 启动 暂停 删除
 
         public IActionResult StartAppPool(string poolName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.StartAppPool(poolName);
@@ -81,6 +114,13 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
         public IActionResult StopAppPool(string poolName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.StartAppPool(poolName);
@@ -92,13 +132,21 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(500);
         }
 
-        public IActionResult CreateAppPool(long timestamp, string sign)
-        {
-            return View();
-        }
-
         public IActionResult DeleteAppPool(string poolName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(500); }
+            }
             try
             {
                 IISUtil.DeleteAppPool(poolName);
@@ -108,6 +156,19 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
             }
             return StatusCode(500);
+        }
+
+        #endregion
+
+
+        public IActionResult CreateSite(long timestamp, string sign)
+        {
+            return View();
+        }
+
+        public IActionResult CreateAppPool(long timestamp, string sign)
+        {
+            return View();
         }
 
 
