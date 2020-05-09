@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Text;
 using System.Threading;
 using Microsoft.Win32;
 using SharpCompress.Archives;
 using Topshelf;
-using System.Text;
 
 namespace ServerMonitor
 {
@@ -109,33 +109,76 @@ namespace ServerMonitor
 
         private static void Main(string[] args)
         {
-            string unexpandedPath = "%SystemRoot%\\bin\\texturepreviewer.exe -2 -4";
-         var FileName = Environment.ExpandEnvironmentVariables(unexpandedPath);
+            string str = "ipconfig\r\nipconfig";// Console.ReadLine();
 
-            var r=    Path.GetFullPath(@"%SystemRoot%\System32\svchost.exe");
-            var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
-            var root = Path.GetDirectoryName(@"D:\Nlog\111");
-            archive.AddAllFromDirectory(@"D:\Nlog");
+            var file = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".bat");
+            //File.WriteAllText(file, "@echo off\r\n" + str + "\r\nexit");
+            File.WriteAllText(file, str + "\r\nexit");
 
-            archive.SaveTo(@"D:\1.zip", new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
-            {
-                ArchiveEncoding=new SharpCompress.Common.ArchiveEncoding()
-                {
-                    Default= Encoding.UTF8,
-                    Forced= Encoding.UTF8,
-                 }
-            });
-            archive.Dispose();
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            p.StartInfo.FileName = file;// "cmd.exe";
+            p.StartInfo.UseShellExecute = false;    //是否使用操作系统shell启动
+            p.StartInfo.RedirectStandardInput = false;//接受来自调用程序的输入信息
+            p.StartInfo.RedirectStandardOutput = true;//由调用程序获取输出信息
+            p.StartInfo.RedirectStandardError = true;//重定向标准错误输出
+            p.StartInfo.CreateNoWindow = true;//不显示程序窗口
+            p.Start();//启动程序
 
-            var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
-            var pn =(int) key.GetValue("PortNumber");
-            key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp");
-            pn = (int) key.GetValue("PortNumber");
-            var kid = key.GetValueKind("PortNumber");
-            var name = key.GetValueNames();
-            // mstsc
-            List<SoftwareInfo> softwareInfos = new List<SoftwareInfo>();
-            ShowAllSoftwaresName(softwareInfos);
+            //向cmd窗口发送输入信息
+            //p.StandardInput.WriteLine("@echo off\r\n" + str + "\r\nexit");
+
+            //p.StandardInput.AutoFlush = true;
+            //p.StandardInput.WriteLine("exit");
+            //向标准输入写入要执行的命令。这里使用&是批处理命令的符号，表示前面一个命令不管是否执行成功都执行后面(exit)命令，如果不执行exit命令，后面调用ReadToEnd()方法会假死
+            //同类的符号还有&&和||前者表示必须前一个命令执行成功才会执行后面的命令，后者表示必须前一个命令执行失败才会执行后面的命令
+
+
+
+            //获取cmd窗口的输出信息
+            string output = p.StandardOutput.ReadToEnd();
+
+            //StreamReader reader = p.StandardOutput;
+            //string line=reader.ReadLine();
+            //while (!reader.EndOfStream)
+            //{
+            //    str += line + "  ";
+            //    line = reader.ReadLine();
+            //}
+
+            p.WaitForExit();//等待程序执行完退出进程
+            p.Close();
+
+
+            Console.WriteLine(output);
+            Console.ReadKey();
+
+            //   string unexpandedPath = "%SystemRoot%\\bin\\texturepreviewer.exe -2 -4";
+            //var FileName = Environment.ExpandEnvironmentVariables(unexpandedPath);
+
+            //   var r=    Path.GetFullPath(@"%SystemRoot%\System32\svchost.exe");
+            //   var archive = ArchiveFactory.Create(SharpCompress.Common.ArchiveType.Zip);
+            //   var root = Path.GetDirectoryName(@"D:\Nlog\111");
+            //   archive.AddAllFromDirectory(@"D:\Nlog");
+
+            //   archive.SaveTo(@"D:\1.zip", new SharpCompress.Writers.WriterOptions(SharpCompress.Common.CompressionType.Deflate)
+            //   {
+            //       ArchiveEncoding=new SharpCompress.Common.ArchiveEncoding()
+            //       {
+            //           Default= Encoding.UTF8,
+            //           Forced= Encoding.UTF8,
+            //        }
+            //   });
+            //   archive.Dispose();
+
+            //   var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\Wds\rdpwd\Tds\tcp");
+            //   var pn =(int) key.GetValue("PortNumber");
+            //   key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp");
+            //   pn = (int) key.GetValue("PortNumber");
+            //   var kid = key.GetValueKind("PortNumber");
+            //   var name = key.GetValueNames();
+            //   // mstsc
+            //   List<SoftwareInfo> softwareInfos = new List<SoftwareInfo>();
+            //   ShowAllSoftwaresName(softwareInfos);
         }
 
 
