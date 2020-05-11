@@ -216,6 +216,7 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static void StopAppPool(string poolName)
         {
             ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
             if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
             {
                 manager.ApplicationPools[poolName].Stop();
@@ -225,6 +226,7 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static void StartAppPool(string poolName)
         {
             ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
             if (manager.ApplicationPools[poolName].State != ObjectState.Started && manager.ApplicationPools[poolName].State != ObjectState.Starting)
             {
                 manager.ApplicationPools[poolName].Start();
@@ -233,28 +235,14 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static void DeleteAppPool(string poolName)
         {
             ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
             if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
             {
                 manager.ApplicationPools[poolName].Stop();
             }
             manager.ApplicationPools.Remove(manager.ApplicationPools[poolName]);
+            manager.CommitChanges();
         }
-        //public static void StopSitePools(string siteName)
-        //{
-        //    ServerManager manager = new ServerManager();
-        //    IEnumerable<Site> sites = manager.Sites.Where(s => s.Name.Equals(siteName));
-        //    if (sites != null && sites.Count() > 0)
-        //    {
-        //        Site site = sites.First();
-        //        List<string> appPools = new List<string>();
-
-        //        var apps = site.Applications;
-        //        foreach (var app in apps)
-        //        {
-        //            //app.ApplicationPoolName
-        //        }
-        //    }
-        //}
 
         public static void KeepPoolActive(string poolName)
         {
@@ -323,21 +311,20 @@ namespace WebsiteService.MonitorTerminal.Utils
                     string url = item.Protocol + "://";
                     if (item.EndPoint.Address.ToString() == "0.0.0.0")
                     {
-                        url += item.Host + ":" + item.EndPoint.Port;
+                        if (string.IsNullOrEmpty(item.Host))
+                        {
+                            url += "*:" + item.EndPoint.Port;
+                        }
+                        else
+                        {
+                            url += item.Host + ":" + item.EndPoint.Port;
+                        }
                     }
                     else
                     {
                         url += item.EndPoint.Address.ToString() + ":" + item.EndPoint.Port;
                     }
                     siteInfo.Bindings.Add(url);
-
-                    //SiteBinding siteBinding = new SiteBinding() {
-                    //    BindingInformation = item.BindingInformation,
-                    //    Protocol = item.Protocol,
-                    //    Host = item.Host,
-                    //    IsIPPortHostBinding = item.IsIPPortHostBinding
-                    //};
-                    //siteInfo.Bindings.Add(siteBinding);
                 }
                 siteInfos.Add(siteInfo);
             }

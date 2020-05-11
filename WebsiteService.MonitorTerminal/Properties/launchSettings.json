@@ -20,7 +20,7 @@
     "WebsiteService.MonitorTerminal": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "Server/GetServiceList",
+      "launchUrl": "IIS/GetSiteList",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

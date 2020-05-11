@@ -15,6 +15,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
         {
         }
 
+        [HttpGet("IIS/GetSiteList")]
         public IActionResult GetSiteList(long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -28,6 +29,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
         }
 
         #region 站点 启动 暂停 删除
+        [HttpGet("IIS/StartSite")]
         public IActionResult StartSite(string siteName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -48,6 +50,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(404);
         }
 
+        [HttpGet("IIS/StopSite")]
         public IActionResult StopSite(string siteName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -59,7 +62,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             try
             {
-                IISUtil.StartSite(siteName);
+                IISUtil.StopSite(siteName);
                 return Ok();
             }
             catch (Exception ex)
@@ -68,6 +71,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(404);
         }
 
+        [HttpGet("IIS/DeleteSite")]
         public IActionResult DeleteSite(string siteName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -92,6 +96,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
         #region 应用程序池 启动 暂停 删除
 
+        [HttpGet("IIS/StartAppPool")]
         public IActionResult StartAppPool(string poolName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -112,6 +117,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(404);
         }
 
+        [HttpGet("IIS/StopAppPool")]
         public IActionResult StopAppPool(string poolName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -123,7 +129,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             }
             try
             {
-                IISUtil.StartAppPool(poolName);
+                IISUtil.StopAppPool(poolName);
                 return Ok();
             }
             catch (Exception ex)
@@ -132,6 +138,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(404);
         }
 
+        [HttpGet("IIS/DeleteAppPool")]
         public IActionResult DeleteAppPool(string poolName, long timestamp, string sign)
         {
             if (IsSignParameter())
