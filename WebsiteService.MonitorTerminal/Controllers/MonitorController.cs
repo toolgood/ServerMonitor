@@ -60,27 +60,33 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpGet("Monitor/GetAppSetting")]
         public IActionResult GetAppSetting(long timestamp, string sign)
         {
-
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
 
 
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("Monitor/SetAppSetting")]
         public IActionResult SetAppSetting(long timestamp, string sign)
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("Monitor/BlackupAppSetting")]
         public IActionResult BlackupAppSetting(long timestamp, string sign)
         {
             return View();
         }
-        [HttpPost]
+
+        [HttpGet("Monitor/BlackupAppSetting")]
         public IActionResult RestoreAppSetting(long timestamp, string sign)
         {
             return View();
