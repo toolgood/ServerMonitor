@@ -94,7 +94,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
         #endregion
 
-        #region 应用程序池 启动 暂停 删除
+        #region 应用程序池 启动 暂停 删除 回收
 
         [HttpGet("IIS/StartAppPool")]
         public IActionResult StartAppPool(string poolName, long timestamp, string sign)
@@ -148,12 +148,6 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
-            if (IsSignParameter())
-            {
-                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
-                keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
-            }
             try
             {
                 IISUtil.DeleteAppPool(poolName);
@@ -165,6 +159,26 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return StatusCode(404);
         }
 
+        [HttpGet("IIS/RecycleAppPool")]
+        public IActionResult RecycleAppPool(string poolName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            try
+            {
+                IISUtil.RecycleAppPool(poolName);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+            }
+            return StatusCode(404);
+        }
         #endregion
 
 
