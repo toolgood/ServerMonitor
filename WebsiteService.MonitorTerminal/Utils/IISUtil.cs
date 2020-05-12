@@ -113,8 +113,8 @@ namespace WebsiteService.MonitorTerminal.Utils
                 ServerManager iisManager = new ServerManager();
                 ApplicationPool appPool = iisManager.ApplicationPools.Add(appPoolName);
                 appPool.AutoStart = true;
-                appPool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
-                appPool.ManagedRuntimeVersion = "v2.0";
+                appPool.ManagedPipelineMode = isClassic ? ManagedPipelineMode.Classic : ManagedPipelineMode.Integrated;
+                appPool.ManagedRuntimeVersion = version;
                 iisManager.CommitChanges();
             }
 
@@ -315,13 +315,13 @@ namespace WebsiteService.MonitorTerminal.Utils
             return appPools;
         }
 
-        public static List<SiteInfo> GetSites()
+        public static List<SiteMiniInfo> GetSites()
         {
-            List<SiteInfo> siteInfos = new List<SiteInfo>();
+            List<SiteMiniInfo> siteInfos = new List<SiteMiniInfo>();
             var server = new ServerManager();//请使用管理员模式
             foreach (Site site in server.Sites)
             {
-                SiteInfo siteInfo = new SiteInfo()
+                SiteMiniInfo siteInfo = new SiteMiniInfo()
                 {
                     Name = site.Name,
                     Id = site.Id,
@@ -331,7 +331,7 @@ namespace WebsiteService.MonitorTerminal.Utils
                     PhysicalPath = site.Applications["/"].VirtualDirectories["/"].PhysicalPath
                 };
                 siteInfo.AppPoolName = string.Join(",", site.Applications.Select(q => q.ApplicationPoolName));
-                if (site.Applications.Count==1)
+                if (site.Applications.Count == 1)
                 {
                     var appPool = server.ApplicationPools.Where(q => q.Name == siteInfo.AppPoolName).FirstOrDefault();
                     if (appPool != null)
@@ -347,13 +347,13 @@ namespace WebsiteService.MonitorTerminal.Utils
                         var appPool = server.ApplicationPools.Where(q => q.Name == item.ApplicationPoolName).FirstOrDefault();
                         if (appPool != null)
                         {
-                            if (appPoolStates.Contains(appPool.State.ToString())==false)
+                            if (appPoolStates.Contains(appPool.State.ToString()) == false)
                             {
                                 appPoolStates.Add(appPool.State.ToString());
                             }
                         }
                     }
-                    if (appPoolStates.Count==1)
+                    if (appPoolStates.Count == 1)
                     {
                         siteInfo.AppPoolState = appPoolStates[0];
                     }
@@ -362,7 +362,7 @@ namespace WebsiteService.MonitorTerminal.Utils
                         siteInfo.AppPoolState = "异常";
                     }
                 }
-       
+
                 siteInfo.Bindings = new List<string>();
                 foreach (Binding item in site.Bindings)
                 {

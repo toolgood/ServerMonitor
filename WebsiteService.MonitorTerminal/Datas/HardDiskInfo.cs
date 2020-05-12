@@ -7,6 +7,9 @@ namespace WebsiteService.MonitorTerminal.Datas
 {
     public class HardDiskInfo
     {
+        /// <summary>
+        /// 盘名
+        /// </summary>
         public string Name { get; set; }
         /// <summary>
         /// 硬盘可用空间 GB

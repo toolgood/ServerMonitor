@@ -6,20 +6,6 @@ using Microsoft.Web.Administration;
 
 namespace WebsiteService.MonitorTerminal.Datas.IIS
 {
-    public class AppPoolMiniInfo
-    {
-        public string Name { get; set; }
-        public bool Enable32BitAppOnWin64 { get; set; }
-        public bool AutoStart { get; set; }
-        public StartMode StartMode { get; set; }
-        public string ManagedRuntimeVersion { get; set; }
-        public ManagedPipelineMode ManagedPipelineMode { get; set; }
-        public ObjectState State { get; }
-        public ProcessModelIdentityType IdentityType { get; set; }
-        public string UserName { get; set; }
-
-        public int SiteCount { get; set; }
-    }
 
     public class AppPoolInfo
     {

@@ -8,14 +8,24 @@ namespace WebsiteService.MonitorTerminal.Datas
 {
     public class FolderInfo
     {
+        /// <summary>
+        /// 路径
+        /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// 名称
+        /// </summary>
         public string Name { get; set; }
-
-        [JsonIgnore]
+        /// <summary>
+        /// 扩展名
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Extension { get; set; }
-
-        [JsonIgnore]
+        /// <summary>
+        /// 文件大小 B
+        /// </summary>
+        [JsonProperty(NullValueHandling= NullValueHandling.Ignore)]
         public long? Size { get; set; }
 
         /// <summary>
@@ -23,10 +33,16 @@ namespace WebsiteService.MonitorTerminal.Datas
         /// </summary>
         public int FileType { get; set; }
 
-        [JsonIgnore]
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? LastWriteTime  { get; set; }
 
-        [JsonIgnore]
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? CreationTime  { get; set; }
 
 

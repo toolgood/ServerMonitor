@@ -22,7 +22,9 @@ namespace WebsiteService.MonitorTerminal.Datas.Config
         /// </summary>
         public WindowServiceInfo WindowService { get; set; }
 
-
+        /// <summary>
+        /// 加密信息
+        /// </summary>
         public LetsEncryptInfo LetsEncrypt { get; set; }
 
     }
