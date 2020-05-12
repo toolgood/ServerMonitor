@@ -77,18 +77,39 @@ namespace WebsiteService.MonitorTerminal.Controllers
         [HttpGet("Monitor/SetAppSetting")]
         public IActionResult SetAppSetting(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
         [HttpGet("Monitor/BlackupAppSetting")]
         public IActionResult BlackupAppSetting(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
         [HttpGet("Monitor/BlackupAppSetting")]
         public IActionResult RestoreAppSetting(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
@@ -96,6 +117,13 @@ namespace WebsiteService.MonitorTerminal.Controllers
         [HttpPost]
         public IActionResult RestartMonitor(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
@@ -103,27 +131,60 @@ namespace WebsiteService.MonitorTerminal.Controllers
         [HttpPost]
         public IActionResult UploadMonitor(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
         [HttpPost]
         public IActionResult BlackupMonitor(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
         [HttpPost]
         public IActionResult UpdateMonitor(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
         [HttpPost]
         public IActionResult RestoreMonitor(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
+
+        private string GetAppSettingJson()
+        {
+            return "";
+        }
     }
 
 

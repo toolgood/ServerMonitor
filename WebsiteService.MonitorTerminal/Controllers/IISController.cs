@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
 
 
-        #region 站点 启动 暂停 删除
+        #region 站点 启动 暂停 删除 ResetSite
         [HttpGet("IIS/StartSite")]
         public IActionResult StartSite(string siteName, long timestamp, string sign)
         {
@@ -78,6 +79,28 @@ namespace WebsiteService.MonitorTerminal.Controllers
             try
             {
                 IISUtil.StopSite(siteName);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+            }
+            return StatusCode(404);
+        }
+
+
+        [HttpGet("IIS/ResetSite")]
+        public IActionResult ResetSite(string siteName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            try
+            {
+                IISUtil.ResetSite(siteName);
                 return Ok();
             }
             catch (Exception ex)
@@ -196,46 +219,61 @@ namespace WebsiteService.MonitorTerminal.Controllers
         }
         #endregion
 
-
+        [HttpGet("IIS/StartSite")]
         public IActionResult CreateSite(long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
             return View();
         }
 
+        [HttpGet("IIS/CreateAppPool")]
         public IActionResult CreateAppPool(long timestamp, string sign)
         {
             return View();
         }
 
 
-        [HttpPost]
+        [HttpGet("IIS/UploadWebsite")]
         public IActionResult UploadWebsite(long timestamp, string sign)
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("IIS/BlackupWebsite")]
         public IActionResult BlackupWebsite(long timestamp, string sign)
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("IIS/UpdateWebsite")]
         public IActionResult UpdateWebsite(long timestamp, string sign)
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("IIS/RestoreWebsite")]
         public IActionResult RestoreWebsite(long timestamp, string sign)
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpGet("IIS/RestartIIS")]
         public IActionResult RestartIIS(long timestamp, string sign)
         {
-            return View();
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            Process.Start("iisreset");
+            return Ok();
         }
 
 

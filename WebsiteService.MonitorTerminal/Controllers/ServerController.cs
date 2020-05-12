@@ -37,6 +37,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
             try
             {
                 ServerUtil.StopService(serviceName);
@@ -58,6 +60,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
             try
             {
                 ServerUtil.StartService(serviceName);
@@ -67,30 +71,67 @@ namespace WebsiteService.MonitorTerminal.Controllers
             {
             }
             return StatusCode(404);
-        } 
+        }
         #endregion
 
         [HttpPost]
         public IActionResult UploadService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
+
+
             return View();
         }
 
         [HttpPost]
         public IActionResult BlackupService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
+
             return View();
         }
 
         [HttpPost]
         public IActionResult UpdateService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
+
             return View();
         }
 
         [HttpPost]
         public IActionResult RestoreService(string serviceName, long timestamp, string sign)
         {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            if (serviceName == "WebsiteService.MonitorTerminal") { return StatusCode(404); }
+            if (serviceName == "WebsiteService.AutoGuard") { return StatusCode(404); }
+
             return View();
         }
 

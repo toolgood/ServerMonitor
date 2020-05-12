@@ -1,320 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
-using System.Threading.Tasks;
 using Microsoft.Web.Administration;
-using WebsiteService.MonitorTerminal.Datas;
 using WebsiteService.MonitorTerminal.Datas.IIS;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
     public static class IISUtil
     {
-        public static void ResetSite(string siteName)
-        {
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-            site.Stop();
-            site.Start();
-        }
-
-        public static string StopSite(string siteName)
-        {
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-            return site.Stop().ToString();
-        }
-
-        public static string StartSite(string siteName)
-        {
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-            var s = site.Start().ToString();
-            StartAppPool(site.ApplicationDefaults.ApplicationPoolName);
-            return s;
-        }
-
-        public static string GetSiteState(string siteName)
-        {
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-
-            return site.State.ToString();
-        }
-
-        public static bool DoesExistSite(string siteName)
-        {
-            try
-            {
-                ServerManager manager = new ServerManager();
-
-                Site site = manager.Sites[siteName];
-                return site != null;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static void DeleteSite(string siteName)
-        {
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-            manager.Sites.Remove(site);
-            manager.CommitChanges();
-        }
-
-        private static void CreateDirectory(string dirPath)
-        {
-            DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
-            CreateIISDirectory(dirInfo);
-        }
-
-        private static bool CreateIISDirectory(DirectoryInfo dirInfo)
-        {
-            try
-            {
-                DirectorySecurity security = new DirectorySecurity();
-                security.AddAccessRule(new FileSystemAccessRule("Everyone", FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-
-                if (!dirInfo.Exists)
-                {
-                    dirInfo.Create();
-                }
-
-                // 设置Everyone权限
-                dirInfo.SetAccessControl(security);
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 创建应用程序池
-        /// </summary>
-        /// <param name="appPoolName"></param>
-        /// <param name="version"></param>
-        /// <param name="isClassic"></param>
-        public static void CreateAppPool(string appPoolName, string version, bool isClassic)
-        {
-            if (!DoesExistAppPool(appPoolName))
-            {
-                ServerManager iisManager = new ServerManager();
-                ApplicationPool appPool = iisManager.ApplicationPools.Add(appPoolName);
-                appPool.AutoStart = true;
-                appPool.ManagedPipelineMode = isClassic ? ManagedPipelineMode.Classic : ManagedPipelineMode.Integrated;
-                appPool.ManagedRuntimeVersion = version;
-                iisManager.CommitChanges();
-            }
-
-            ServerManager manager = new ServerManager();
-
-            manager.ApplicationPools[appPoolName].ManagedRuntimeVersion = version;
-            manager.ApplicationPools[appPoolName].ManagedPipelineMode = isClassic ?
-                ManagedPipelineMode.Classic : ManagedPipelineMode.Integrated;
-            manager.ApplicationPools[appPoolName].ProcessModel.IdentityType = ProcessModelIdentityType.LocalSystem;
-            manager.CommitChanges();
-        }
-
-        /// <summary>
-        /// 应用程序池是否存在
-        /// </summary>
-        /// <param name="appPoolName"></param>
-        /// <returns></returns>
-        public static bool DoesExistAppPool(string appPoolName)
-        {
-            ServerManager manager = new ServerManager();
-
-            ApplicationPool pool;
-
-            pool = null;
-            try
-            {
-                pool = manager.ApplicationPools[appPoolName];
-            }
-            catch
-            {
-            }
-            manager.Dispose();
-            return pool != null;
-        }
-
-
-        private static Application FindRootApplication(Site site)
-        {
-            foreach (Application app in site.Applications)
-            {
-                if (!string.IsNullOrEmpty(app.Path) && app.Path == "/")
-                {
-                    return app;
-                }
-            }
-            return null;
-        }
-
-        public static Site CreateSite(string siteName, string port, string appPoolName, string baseFolder)
-        {
-            ServerManager manager = new ServerManager();
-
-            // 如站点存在，删除
-            if (DoesExistSite(siteName))
-            {
-                DeleteSite(siteName);
-            }
-
-            // 建立站点
-            string physicalPath = Path.Combine(baseFolder, siteName);
-            manager.Sites.Add(siteName, "http", string.Format("*:{0}:", port), physicalPath);
-            CreateDirectory(physicalPath);
-            manager.CommitChanges();
-
-            // 创建App Pool, 配置站点设置
-            CreateAppPool(appPoolName, "v4.0", false);
-            Site site = manager.Sites[siteName];
-            Application rootApp = FindRootApplication(site);
-            if (rootApp != null)
-            {
-                rootApp.ApplicationPoolName = appPoolName;
-                manager.CommitChanges();
-            }
-            site = manager.Sites[siteName];
-            manager.CommitChanges();
-
-            return site;
-        }
-
-        public static void CreateApplication(string siteName, string appName, string appPoolName, string baseFolder)
-        {
-            if (!DoesExistAppPool(appPoolName))
-            {
-                CreateAppPool(appPoolName, "v4.0", false);
-            }
-
-            ServerManager manager = new ServerManager();
-
-            Site site = manager.Sites[siteName];
-
-            string phyPath = Path.Combine(baseFolder, appName);
-
-            Application app = site.Applications.Add(string.Format("/{0}", appName), phyPath);
-            CreateDirectory(phyPath);
-            app.ApplicationPoolName = appPoolName;
-
-            manager.CommitChanges();
-        }
-
-        public static void StopAppPool(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
-            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
-            {
-                manager.ApplicationPools[poolName].Stop();
-            }
-        }
-
-        public static void StartAppPool(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
-            if (manager.ApplicationPools[poolName].State != ObjectState.Started && manager.ApplicationPools[poolName].State != ObjectState.Starting)
-            {
-                manager.ApplicationPools[poolName].Start();
-            }
-        }
-        public static void DeleteAppPool(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
-            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
-            {
-                manager.ApplicationPools[poolName].Stop();
-            }
-            manager.ApplicationPools.Remove(manager.ApplicationPools[poolName]);
-            manager.CommitChanges();
-        }
-
-        public static void KeepPoolActive(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            var pool = manager.ApplicationPools[poolName];
-
-            pool.Recycling.PeriodicRestart.Time = new TimeSpan(0, 43200, 0);
-            pool.ProcessModel.IdleTimeout = new TimeSpan(0, 43200, 0);
-            pool.ProcessModel.MaxProcesses = 5;
-
-            manager.CommitChanges();
-        }
-
-        public static List<string> GetAllAppPoolNames()
-        {
-            ServerManager manager = new ServerManager();
-            return manager.ApplicationPools.Select<ApplicationPool, string>(o => o.Name).ToList();
-        }
-
-        public static string RecycleAppPool(string name)
-        {
-            ServerManager manager = new ServerManager();
-            var pool = manager.ApplicationPools[name];
-
-            return pool.Recycle().ToString();
-        }
-
-        public static ObjectState GetAppPoolSatus(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            return manager.ApplicationPools[poolName].State;
-        }
-
-        public static ApplicationPool GetAppPool(string poolName)
-        {
-            ServerManager manager = new ServerManager();
-            return manager.ApplicationPools[poolName];
-        }
-
-        public static List<AppPoolMiniInfo> GetAppPools()
-        {
-            List<AppPoolMiniInfo> appPools = new List<AppPoolMiniInfo>();
-            var server = new ServerManager();//请使用管理员模式
-            foreach (var item in server.ApplicationPools)
-            {
-                appPools.Add(new AppPoolMiniInfo()
-                {
-                    AutoStart = item.AutoStart,
-                    Enable32BitAppOnWin64 = item.Enable32BitAppOnWin64,
-                    ManagedPipelineMode = item.ManagedPipelineMode,
-                    ManagedRuntimeVersion = item.ManagedRuntimeVersion,
-                    StartMode = item.StartMode,
-                    Name = item.Name,
-                    IdentityType = item.ProcessModel.IdentityType,
-                    UserName = item.ProcessModel.UserName
-                });
-            }
-            foreach (Site site in server.Sites)
-            {
-                foreach (var item in site.Applications)
-                {
-                    var appPool = appPools.FirstOrDefault(q => q.Name == item.ApplicationPoolName);
-                    if (appPool != null)
-                    {
-                        appPool.SiteCount++;
-                    }
-                }
-            }
-            return appPools;
-        }
-
+        #region 获取 所有站点 站点
         public static List<SiteMiniInfo> GetSites()
         {
             List<SiteMiniInfo> siteInfos = new List<SiteMiniInfo>();
@@ -387,9 +82,231 @@ namespace WebsiteService.MonitorTerminal.Utils
                 siteInfos.Add(siteInfo);
             }
 
+            server.Dispose();
             return siteInfos;
         }
+       
+        #endregion
 
+        #region 获取应用程序池
+        public static List<AppPoolMiniInfo> GetAppPools()
+        {
+            List<AppPoolMiniInfo> appPools = new List<AppPoolMiniInfo>();
+            var server = new ServerManager();//请使用管理员模式
+            foreach (var item in server.ApplicationPools)
+            {
+                appPools.Add(new AppPoolMiniInfo()
+                {
+                    AutoStart = item.AutoStart,
+                    Enable32BitAppOnWin64 = item.Enable32BitAppOnWin64,
+                    ManagedPipelineMode = item.ManagedPipelineMode,
+                    ManagedRuntimeVersion = item.ManagedRuntimeVersion,
+                    StartMode = item.StartMode,
+                    Name = item.Name,
+                    IdentityType = item.ProcessModel.IdentityType,
+                    UserName = item.ProcessModel.UserName
+                });
+            }
+            foreach (Site site in server.Sites)
+            {
+                foreach (var item in site.Applications)
+                {
+                    var appPool = appPools.FirstOrDefault(q => q.Name == item.ApplicationPoolName);
+                    if (appPool != null)
+                    {
+                        appPool.SiteCount++;
+                    }
+                }
+            }
+
+            server.Dispose();
+            return appPools;
+        }
+
+        #endregion
+
+        #region 站点 新建 
+        public static bool CreateSite(string siteName, string port, string physicalPath, string appPoolName, string version = "v4.0", bool isClassic = false)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                if (manager.Sites.Any(q => q.Name == siteName))
+                {
+                    return false;
+                }
+
+                // 建立站点
+                manager.Sites.Add(siteName, "http", string.Format("*:{0}:", port), physicalPath);
+                CreateDirectory(physicalPath);
+                manager.CommitChanges();
+
+                // 创建App Pool, 配置站点设置
+                CreateAppPool(appPoolName, version, isClassic);
+                Site site = manager.Sites[siteName];
+                Application rootApp = FindRootApplication(site);
+                if (rootApp != null)
+                {
+                    rootApp.ApplicationPoolName = appPoolName;
+                }
+                manager.CommitChanges();
+                return true;
+            }
+        }
+
+        public static bool AddApplication(string siteName, string appName, string phyPath, string poolName)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                Site site = manager.Sites[siteName];
+                if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) return false;
+
+
+                Application app = site.Applications.Add(string.Format("/{0}", appName), phyPath);
+                CreateDirectory(phyPath);
+                app.ApplicationPoolName = poolName;
+
+                manager.CommitChanges();
+                return true;
+            }
+        }
+
+        private static void CreateDirectory(string dirPath)
+        {
+            DirectoryInfo dirInfo = new DirectoryInfo(dirPath);
+            try
+            {
+                if (!dirInfo.Exists)
+                {
+                    dirInfo.Create();
+                }
+
+                DirectorySecurity security = new DirectorySecurity();
+                security.AddAccessRule(new FileSystemAccessRule("Everyone", FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                dirInfo.SetAccessControl(security);
+            }
+            catch { }
+        }
+
+        private static Application FindRootApplication(Site site)
+        {
+            foreach (Application app in site.Applications)
+            {
+                if (!string.IsNullOrEmpty(app.Path) && app.Path == "/")
+                {
+                    return app;
+                }
+            }
+            return null;
+        }
+        #endregion
+
+        #region 站点 启动 暂停 重启
+        public static void ResetSite(string siteName)
+        {
+            ServerManager manager = new ServerManager();
+
+            Site site = manager.Sites[siteName];
+            site.Stop();
+            site.Start();
+        }
+
+        public static string StopSite(string siteName)
+        {
+            ServerManager manager = new ServerManager();
+
+            Site site = manager.Sites[siteName];
+            return site.Stop().ToString();
+        }
+
+        public static string StartSite(string siteName)
+        {
+            ServerManager manager = new ServerManager();
+
+            Site site = manager.Sites[siteName];
+            var s = site.Start().ToString();
+            StartAppPool(site.ApplicationDefaults.ApplicationPoolName);
+            return s;
+        }
+        public static void DeleteSite(string siteName)
+        {
+            ServerManager manager = new ServerManager();
+
+            Site site = manager.Sites[siteName];
+            manager.Sites.Remove(site);
+            manager.CommitChanges();
+        }
+
+        #endregion
+
+        #region 应用程序池 新建 
+        /// <summary>
+        /// 创建应用程序池
+        /// </summary>
+        /// <param name="appPoolName"></param>
+        /// <param name="version"></param>
+        /// <param name="isClassic"></param>
+        public static bool CreateAppPool(string poolName, string version, bool isClassic)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                if (manager.ApplicationPools.Any(q => q.Name == poolName) == false)
+                {
+                    ApplicationPool appPool = manager.ApplicationPools.Add(poolName);
+                    appPool.AutoStart = true;
+                    appPool.ManagedPipelineMode = isClassic ? ManagedPipelineMode.Classic : ManagedPipelineMode.Integrated;
+                    appPool.ManagedRuntimeVersion = version;
+                    appPool.ProcessModel.IdentityType = ProcessModelIdentityType.LocalSystem;
+                    manager.CommitChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region 应用程序池 启动 暂停 删除 回收
+        public static void StopAppPool(string poolName)
+        {
+            ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
+            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
+            {
+                manager.ApplicationPools[poolName].Stop();
+            }
+        }
+
+        public static void StartAppPool(string poolName)
+        {
+            ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
+            if (manager.ApplicationPools[poolName].State != ObjectState.Started && manager.ApplicationPools[poolName].State != ObjectState.Starting)
+            {
+                manager.ApplicationPools[poolName].Start();
+            }
+        }
+        public static void DeleteAppPool(string poolName)
+        {
+            ServerManager manager = new ServerManager();
+            if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) { return; }
+            if (manager.ApplicationPools[poolName].State != ObjectState.Stopped && manager.ApplicationPools[poolName].State != ObjectState.Stopping)
+            {
+                manager.ApplicationPools[poolName].Stop();
+            }
+            manager.ApplicationPools.Remove(manager.ApplicationPools[poolName]);
+            manager.CommitChanges();
+        }
+        public static string RecycleAppPool(string name)
+        {
+            ServerManager manager = new ServerManager();
+            var pool = manager.ApplicationPools[name];
+
+            return pool.Recycle().ToString();
+        }
+        #endregion
+
+ 
+ 
     }
 
 }
