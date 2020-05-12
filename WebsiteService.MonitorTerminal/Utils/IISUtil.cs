@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Web.Administration;
 using WebsiteService.MonitorTerminal.Datas.IIS;
 
@@ -305,8 +307,37 @@ namespace WebsiteService.MonitorTerminal.Utils
         }
         #endregion
 
- 
- 
+        #region 获取 证书信息
+
+
+        #endregion
+        private static X509Certificate2 GetSentosaCertificate()
+        {
+            X509Store userCaStore = new X509Store( StoreLocation.LocalMachine);
+            try
+            {
+                userCaStore.Open(OpenFlags.ReadOnly);
+                X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
+                 X509Certificate2 clientCertificate = null;
+
+
+
+                //if (findResult.Count == 1)
+                //{
+                //    clientCertificate = findResult[0];
+                //}
+                //else
+                //{
+                //    throw new Exception("Unable to locate the correct client certificate.");
+                //}
+                return clientCertificate;
+            }
+            finally
+            {
+                userCaStore.Close();
+            }
+        }
+
     }
 
 }
