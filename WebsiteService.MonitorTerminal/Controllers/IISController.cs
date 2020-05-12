@@ -28,6 +28,21 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Json(r);
         }
 
+        [HttpGet("IIS/GetAppPools")]
+        public IActionResult GetAppPools(long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var r = IISUtil.GetAppPools();
+            return Json(r);
+        }
+
+
+
         #region 站点 启动 暂停 删除
         [HttpGet("IIS/StartSite")]
         public IActionResult StartSite(string siteName, long timestamp, string sign)

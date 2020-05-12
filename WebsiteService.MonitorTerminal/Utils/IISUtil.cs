@@ -283,6 +283,37 @@ namespace WebsiteService.MonitorTerminal.Utils
             return manager.ApplicationPools[poolName];
         }
 
+        public static List<AppPoolMiniInfo> GetAppPools()
+        {
+            List<AppPoolMiniInfo> appPools = new List<AppPoolMiniInfo>();
+            var server = new ServerManager();//请使用管理员模式
+            foreach (var item in server.ApplicationPools)
+            {
+                appPools.Add(new AppPoolMiniInfo()
+                {
+                    AutoStart = item.AutoStart,
+                    Enable32BitAppOnWin64 = item.Enable32BitAppOnWin64,
+                    ManagedPipelineMode = item.ManagedPipelineMode,
+                    ManagedRuntimeVersion = item.ManagedRuntimeVersion,
+                    StartMode = item.StartMode,
+                    Name = item.Name,
+                    IdentityType = item.ProcessModel.IdentityType,
+                    UserName = item.ProcessModel.UserName
+                });
+            }
+            foreach (Site site in server.Sites)
+            {
+                foreach (var item in site.Applications)
+                {
+                    var appPool = appPools.FirstOrDefault(q => q.Name == item.ApplicationPoolName);
+                    if (appPool != null)
+                    {
+                        appPool.SiteCount++;
+                    }
+                }
+            }
+            return appPools;
+        }
 
         public static List<SiteInfo> GetSites()
         {
@@ -298,14 +329,40 @@ namespace WebsiteService.MonitorTerminal.Utils
                     AppPoolName = site.ApplicationDefaults.ApplicationPoolName,
                     SiteState = site.State.ToString(),
                     PhysicalPath = site.Applications["/"].VirtualDirectories["/"].PhysicalPath
-
                 };
-                // s.Pool = site.Applications["/"].ApplicationPoolName;
-                var appPool = server.ApplicationPools.Where(q => q.Name == siteInfo.AppPoolName).FirstOrDefault();
-                if (appPool != null)
+                siteInfo.AppPoolName = string.Join(",", site.Applications.Select(q => q.ApplicationPoolName));
+                if (site.Applications.Count==1)
                 {
-                    siteInfo.AppPoolState = appPool.State.ToString();
+                    var appPool = server.ApplicationPools.Where(q => q.Name == siteInfo.AppPoolName).FirstOrDefault();
+                    if (appPool != null)
+                    {
+                        siteInfo.AppPoolState = appPool.State.ToString();
+                    }
                 }
+                else if (site.Applications.Count > 1)
+                {
+                    List<string> appPoolStates = new List<string>();
+                    foreach (var item in site.Applications)
+                    {
+                        var appPool = server.ApplicationPools.Where(q => q.Name == item.ApplicationPoolName).FirstOrDefault();
+                        if (appPool != null)
+                        {
+                            if (appPoolStates.Contains(appPool.State.ToString())==false)
+                            {
+                                appPoolStates.Add(appPool.State.ToString());
+                            }
+                        }
+                    }
+                    if (appPoolStates.Count==1)
+                    {
+                        siteInfo.AppPoolState = appPoolStates[0];
+                    }
+                    else
+                    {
+                        siteInfo.AppPoolState = "异常";
+                    }
+                }
+       
                 siteInfo.Bindings = new List<string>();
                 foreach (Binding item in site.Bindings)
                 {

@@ -17,24 +17,25 @@ namespace WebsiteService.MonitorTerminal.Datas.IIS
         public ObjectState State { get; }
         public ProcessModelIdentityType IdentityType { get; set; }
         public string UserName { get; set; }
+
+        public int SiteCount { get; set; }
     }
+
     public class AppPoolInfo
     {
         public string Name { get; set; }
         public bool Enable32BitAppOnWin64 { get; set; }
         public StartMode StartMode { get; set; }
 
-
-
         public bool AutoStart { get; set; }
-        public ApplicationPoolCpu Cpu { get; }
-        public ApplicationPoolFailure Failure { get; }
+        public ApplicationPoolCpu Cpu { get; set; }
+        public ApplicationPoolFailure Failure { get; set; }
         public ManagedPipelineMode ManagedPipelineMode { get; set; }
         public string ManagedRuntimeVersion { get; set; }
         public ApplicationPoolProcessModel ProcessModel { get; }
         public long QueueLength { get; set; }
         public ApplicationPoolRecycling Recycling { get; }
-        public ObjectState State { get; }
+        public ObjectState State { get; set; }
         public WorkerProcessCollection WorkerProcesses { get; }
     }
 }
