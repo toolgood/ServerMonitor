@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using Microsoft.Win32;
@@ -109,6 +110,29 @@ namespace ServerMonitor
 
         private static void Main(string[] args)
         {
+            X509Store userCaStore =  new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            try
+            {
+                userCaStore.Open(OpenFlags.ReadOnly);
+                X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
+ 
+
+
+                //if (findResult.Count == 1)
+                //{
+                //    clientCertificate = findResult[0];
+                //}
+                //else
+                //{
+                //    throw new Exception("Unable to locate the correct client certificate.");
+                //}
+             }
+            finally
+            {
+                userCaStore.Close();
+            }
+
+
             string str = "ipconfig\r\nipconfig";// Console.ReadLine();
 
             var file = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".bat");

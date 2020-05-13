@@ -87,7 +87,7 @@ namespace WebsiteService.MonitorTerminal.Utils
             server.Dispose();
             return siteInfos;
         }
-       
+
         #endregion
 
         #region 获取应用程序池
@@ -307,36 +307,31 @@ namespace WebsiteService.MonitorTerminal.Utils
         }
         #endregion
 
-        #region 获取 证书信息
-
-
-        #endregion
-        private static X509Certificate2 GetSentosaCertificate()
+        #region 获取 可用的证书信息
+        public static List<string> GetCertificateNames()
         {
-            X509Store userCaStore = new X509Store( StoreLocation.LocalMachine);
+            List<string> names = new List<string>();
+            X509Store userCaStore = new X509Store(StoreLocation.LocalMachine);
             try
             {
                 userCaStore.Open(OpenFlags.ReadOnly);
                 X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
-                 X509Certificate2 clientCertificate = null;
-
-
-
-                //if (findResult.Count == 1)
-                //{
-                //    clientCertificate = findResult[0];
-                //}
-                //else
-                //{
-                //    throw new Exception("Unable to locate the correct client certificate.");
-                //}
-                return clientCertificate;
+                foreach (var item in certificatesInStore)
+                {
+                    if (item.NotAfter>DateTime.Now && item.NotBefore<DateTime.Now)
+                    {
+                        names.Add(item.FriendlyName);
+                    }
+                }
+                return names;
             }
-            finally
+            finally 
             {
                 userCaStore.Close();
             }
         }
+        #endregion
+ 
 
     }
 
