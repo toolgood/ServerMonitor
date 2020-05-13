@@ -115,8 +115,8 @@ namespace ServerMonitor
             {
                 userCaStore.Open(OpenFlags.ReadOnly);
                 X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
- 
 
+              var t=  certificatesInStore[0].GetCertHash();
 
                 //if (findResult.Count == 1)
                 //{

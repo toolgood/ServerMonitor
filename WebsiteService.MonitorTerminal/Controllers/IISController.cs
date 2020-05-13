@@ -43,7 +43,6 @@ namespace WebsiteService.MonitorTerminal.Controllers
         }
 
 
-
         #region 站点 启动 暂停 删除 ResetSite
         [HttpGet("IIS/StartSite")]
         public IActionResult StartSite(string siteName, long timestamp, string sign)
@@ -219,8 +218,9 @@ namespace WebsiteService.MonitorTerminal.Controllers
         }
         #endregion
 
-        [HttpGet("IIS/StartSite")]
-        public IActionResult CreateSite(long timestamp, string sign)
+        #region GetCertificates
+        [HttpGet("IIS/GetCertificates")]
+        public IActionResult GetCertificates(long timestamp, string sign)
         {
             if (IsSignParameter())
             {
@@ -228,16 +228,67 @@ namespace WebsiteService.MonitorTerminal.Controllers
                 keys[nameof(timestamp)] = timestamp.ToString();
                 if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
             }
-
-            return View();
+            var info = IISUtil.GetCertificates();
+            return Json(info);
         }
+
+        #endregion
+
+        #region 站点 新建 添加虚拟目录 
+        [HttpGet("IIS/StartSite")]
+        public IActionResult CreateSite(string siteName, string port, string physicalPath, string appPoolName, string version, bool isClassic, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(port)] = port.ToString();
+                keys[nameof(physicalPath)] = physicalPath.ToString();
+                keys[nameof(appPoolName)] = appPoolName.ToString();
+                keys[nameof(version)] = version.ToString();
+                keys[nameof(isClassic)] = isClassic.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var b = IISUtil.CreateSite(siteName, port, physicalPath, appPoolName, version, isClassic);
+            return Json(b);
+        }
+        public IActionResult AddVirtualDirectory(string siteName, string directoryName, string phyPath, string poolName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(directoryName)] = directoryName.ToString();
+                keys[nameof(phyPath)] = phyPath.ToString();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var b = IISUtil.AddVirtualDirectory(siteName, directoryName, phyPath, poolName);
+            return Json(b);
+        }
+        #endregion
+
+        #region 应用程序池 新建
 
         [HttpGet("IIS/CreateAppPool")]
-        public IActionResult CreateAppPool(long timestamp, string sign)
+        public IActionResult CreateAppPool(string poolName, string version, bool isClassic, long timestamp, string sign)
         {
-            return View();
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(version)] = version.ToString();
+                keys[nameof(isClassic)] = isClassic.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var b = IISUtil.CreateAppPool(poolName, version, isClassic);
+            return Json(b);
         }
 
+        #endregion
 
         [HttpGet("IIS/UploadWebsite")]
         public IActionResult UploadWebsite(long timestamp, string sign)

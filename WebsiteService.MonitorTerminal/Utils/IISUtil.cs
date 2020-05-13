@@ -155,7 +155,7 @@ namespace WebsiteService.MonitorTerminal.Utils
             }
         }
 
-        public static bool AddApplication(string siteName, string appName, string phyPath, string poolName)
+        public static bool AddVirtualDirectory(string siteName, string directoryName, string phyPath, string poolName)
         {
             using (ServerManager manager = new ServerManager())
             {
@@ -163,7 +163,7 @@ namespace WebsiteService.MonitorTerminal.Utils
                 if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) return false;
 
 
-                Application app = site.Applications.Add(string.Format("/{0}", appName), phyPath);
+                Application app = site.Applications.Add(string.Format("/{0}", directoryName), phyPath);
                 CreateDirectory(phyPath);
                 app.ApplicationPoolName = poolName;
 
@@ -308,10 +308,10 @@ namespace WebsiteService.MonitorTerminal.Utils
         #endregion
 
         #region 获取 可用的证书信息
-        public static List<string> GetCertificateNames()
+        public static List<CertificateInfo> GetCertificates()
         {
-            List<string> names = new List<string>();
-            X509Store userCaStore = new X509Store(StoreLocation.LocalMachine);
+            List<CertificateInfo> names = new List<CertificateInfo>();
+            X509Store userCaStore = new X509Store(StoreName.My,StoreLocation.LocalMachine);
             try
             {
                 userCaStore.Open(OpenFlags.ReadOnly);
@@ -320,7 +320,12 @@ namespace WebsiteService.MonitorTerminal.Utils
                 {
                     if (item.NotAfter>DateTime.Now && item.NotBefore<DateTime.Now)
                     {
-                        names.Add(item.FriendlyName);
+                        names.Add(new CertificateInfo()
+                        {
+                            Name = item.FriendlyName,
+                            CertificateStoreName = "My",
+                            CertificateHashString = item.GetCertHashString()
+                        });
                     }
                 }
                 return names;

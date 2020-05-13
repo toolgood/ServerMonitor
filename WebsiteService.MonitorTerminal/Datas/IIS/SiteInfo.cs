@@ -101,14 +101,12 @@ namespace WebsiteService.MonitorTerminal.Datas.IIS
             {
                 VirtualDirectories.Add(new VirtualDirectory2(item));
             }
-            VirtualDirectoryDefaults = new VirtualDirectoryDefaults2(application.VirtualDirectoryDefaults);
         }
 
         public string ApplicationPoolName { get; set; }
         public string EnabledProtocols { get; set; }
         public string Path { get; set; }
         public List<VirtualDirectory2> VirtualDirectories { get; set; }
-        public VirtualDirectoryDefaults2 VirtualDirectoryDefaults { get; set; }
     }
     public class VirtualDirectory2
     {
@@ -128,19 +126,6 @@ namespace WebsiteService.MonitorTerminal.Datas.IIS
         public string PhysicalPath { get; set; }
         public string UserName { get; set; }
     }
-    public class VirtualDirectoryDefaults2
-    {
-        public VirtualDirectoryDefaults2() { }
-        public VirtualDirectoryDefaults2(VirtualDirectoryDefaults virtualDirectory)
-        {
-            LogonMethod = virtualDirectory.LogonMethod;
-            Password = virtualDirectory.Password;
-            UserName = virtualDirectory.UserName;
-        }
-
-        public AuthenticationLogonMethod LogonMethod { get; set; }
-        public string Password { get; set; }
-        public string UserName { get; set; }
-    }
+ 
 
 }
