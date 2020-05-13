@@ -184,7 +184,7 @@ namespace WebsiteService.MonitorTerminal.Datas.IIS
             ApplicationDomains = new List<ApplicationDomain2>();
             foreach (var item in process.ApplicationDomains)
             {
-
+                ApplicationDomains.Add(new ApplicationDomain2(item));
             }
         }
 

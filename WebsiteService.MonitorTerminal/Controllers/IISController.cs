@@ -245,23 +245,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
         }
         #endregion
 
-        #region GetCertificates
-        [HttpGet("IIS/GetCertificates")]
-        public IActionResult GetCertificates(long timestamp, string sign)
-        {
-            if (IsSignParameter())
-            {
-                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
-                keys[nameof(timestamp)] = timestamp.ToString();
-                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
-            }
-            var info = IISUtil.GetCertificates();
-            return Json(info);
-        }
-
-        #endregion
-
-        #region 站点 新建 添加虚拟目录 
+        #region 站点 新建 添加/删除虚拟目录  
         [HttpGet("IIS/StartSite")]
         public IActionResult CreateSite(string siteName, string port, string physicalPath, string appPoolName, string version, bool isClassic, long timestamp, string sign)
         {
@@ -280,6 +264,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
             var b = IISUtil.CreateSite(siteName, port, physicalPath, appPoolName, version, isClassic);
             return Json(b);
         }
+
+        [HttpGet("IIS/AddVirtualDirectory")]
         public IActionResult AddVirtualDirectory(string siteName, string directoryName, string phyPath, string poolName, long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -295,6 +281,96 @@ namespace WebsiteService.MonitorTerminal.Controllers
             var b = IISUtil.AddVirtualDirectory(siteName, directoryName, phyPath, poolName);
             return Json(b);
         }
+
+        [HttpGet("IIS/DeleteVirtualDirectory")]
+        public IActionResult DeleteVirtualDirectory(string siteName, string directoryName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(directoryName)] = directoryName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var b = IISUtil.DeleteVirtualDirectory(siteName, directoryName);
+            return Json(b);
+        }
+
+
+
+        #endregion
+
+        #region 网站绑定
+        [HttpGet("IIS/AddBinding")]
+        public IActionResult AddBinding(string siteName, string protocol, string bindingInformation, string certificateName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(protocol)] = protocol.ToString();
+                keys[nameof(bindingInformation)] = bindingInformation.ToString();
+                keys[nameof(certificateName)] = certificateName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
+            var b = IISUtil.AddBinding(siteName, protocol, bindingInformation, certificateName);
+            return Json(b);
+        }
+
+        [HttpGet("IIS/EditBinding")]
+        public IActionResult EditBinding(string siteName, string oldBindingInformation, string protocol, string bindingInformation, string certificateName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(oldBindingInformation)] = oldBindingInformation.ToString();
+                keys[nameof(protocol)] = protocol.ToString();
+                keys[nameof(bindingInformation)] = bindingInformation.ToString();
+                keys[nameof(certificateName)] = certificateName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
+            var b = IISUtil.EditBinding(siteName, oldBindingInformation, protocol, bindingInformation, certificateName);
+            return Json(b);
+        }
+
+        [HttpGet("IIS/DeleteBinding")]
+        public IActionResult DeleteBinding(string siteName, string bindingInformation, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(bindingInformation)] = bindingInformation.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+
+            var b = IISUtil.DeleteBinding(siteName, bindingInformation);
+            return Json(b);
+        }
+
+        #endregion
+
+        #region GetCertificates
+        [HttpGet("IIS/GetCertificates")]
+        public IActionResult GetCertificates(long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var info = IISUtil.GetCertificates();
+            return Json(info);
+        }
+
         #endregion
 
         #region 应用程序池 新建

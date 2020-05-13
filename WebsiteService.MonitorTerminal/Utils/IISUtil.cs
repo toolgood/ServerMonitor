@@ -100,6 +100,9 @@ namespace WebsiteService.MonitorTerminal.Utils
             }
             return null;
         }
+
+
+
         #endregion
 
         #region 获取应用程序池
@@ -181,11 +184,14 @@ namespace WebsiteService.MonitorTerminal.Utils
 
         public static bool AddVirtualDirectory(string siteName, string directoryName, string phyPath, string poolName)
         {
+            if (string.IsNullOrWhiteSpace(directoryName))
+            {
+                return false;
+            }
             using (ServerManager manager = new ServerManager())
             {
                 Site site = manager.Sites[siteName];
                 if (manager.ApplicationPools.Any(q => q.Name == poolName) == false) return false;
-
 
                 Application app = site.Applications.Add(string.Format("/{0}", directoryName), phyPath);
                 CreateDirectory(phyPath);
@@ -195,6 +201,46 @@ namespace WebsiteService.MonitorTerminal.Utils
                 return true;
             }
         }
+
+        public static bool DeleteVirtualDirectory(string siteName, string directoryName)
+        {
+            if (string.IsNullOrWhiteSpace(directoryName))
+            {
+                return false;
+            }
+
+            using (ServerManager manager = new ServerManager())
+            {
+                Site site = manager.Sites[siteName];
+
+                for (int i = site.Applications.Count - 1; i >= 0; i--)
+                {
+                    var app = site.Applications[i];
+                    //if (app.Path == "/" + directoryName)
+                    //{
+                    //    site.Applications.RemoveAt(i);
+                    //    manager.CommitChanges();
+                    //    return true;
+                    //}
+                    for (int j = app.VirtualDirectories.Count - 1; j >= 0; j--)
+                    {
+                        var vd = app.VirtualDirectories[j];
+                        if (vd.Path == "/" + directoryName)
+                        {
+                            app.VirtualDirectories.RemoveAt(j);
+                            if (app.VirtualDirectories.Count==0)
+                            {
+                                site.Applications.RemoveAt(i);
+                            }
+                            manager.CommitChanges();
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
 
         private static void CreateDirectory(string dirPath)
         {
@@ -328,6 +374,111 @@ namespace WebsiteService.MonitorTerminal.Utils
             var pool = manager.ApplicationPools[name];
 
             return pool.Recycle().ToString();
+        }
+        #endregion
+
+        #region 网站绑定
+        public static bool AddBinding(string siteName, string protocol, string bindingInformation, string certificateName)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                var site = manager.Sites.FirstOrDefault(q => q.Name == siteName);
+                if (site == null)
+                {
+                    return false;
+                }
+                var binding = site.Bindings.CreateElement();
+                binding.Protocol = protocol;
+                binding.BindingInformation = bindingInformation;
+                binding.SslFlags = SslFlags.None;
+
+                if (string.IsNullOrEmpty(certificateName))
+                {
+                    X509Store userCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                    userCaStore.Open(OpenFlags.ReadOnly);
+                    X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
+                    foreach (var item in certificatesInStore)
+                    {
+                        if (item.NotAfter > DateTime.Now && item.NotBefore < DateTime.Now && item.FriendlyName == certificateName)
+                        {
+                            binding.CertificateStoreName = "My";
+                            binding.CertificateHash = item.GetCertHash();
+                            binding.SslFlags = SslFlags.Sni;
+                            break;
+                        }
+                    }
+                }
+                site.Bindings.Add(binding);
+
+                manager.CommitChanges();
+                return true;
+            }
+        }
+
+        public static bool EditBinding(string siteName, string oldBindingInformation, string protocol, string bindingInformation, string certificateName)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                var site = manager.Sites.FirstOrDefault(q => q.Name == siteName);
+                if (site == null)
+                {
+                    return false;
+                }
+                for (int i = site.Bindings.Count - 1; i >= 0; i--)
+                {
+                    var binding = site.Bindings[i];
+                    if (binding.BindingInformation == oldBindingInformation)
+                    {
+                        binding.Protocol = protocol;
+                        binding.BindingInformation = bindingInformation;
+                        binding.SslFlags = SslFlags.None;
+
+                        if (string.IsNullOrEmpty(certificateName))
+                        {
+                            X509Store userCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                            userCaStore.Open(OpenFlags.ReadOnly);
+                            X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
+                            foreach (var item in certificatesInStore)
+                            {
+                                if (item.NotAfter > DateTime.Now && item.NotBefore < DateTime.Now && item.FriendlyName == certificateName)
+                                {
+                                    binding.CertificateStoreName = "My";
+                                    binding.CertificateHash = item.GetCertHash();
+                                    binding.SslFlags = SslFlags.Sni;
+                                    break;
+                                }
+                            }
+                        }
+
+                        manager.CommitChanges();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public static bool DeleteBinding(string siteName, string bindingInformation)
+        {
+            using (ServerManager manager = new ServerManager())
+            {
+                var site = manager.Sites.FirstOrDefault(q => q.Name == siteName);
+                if (site == null)
+                {
+                    return false;
+                }
+                for (int i = site.Bindings.Count - 1; i >= 0; i--)
+                {
+                    var binding = site.Bindings[i];
+                    if (binding.BindingInformation == bindingInformation)
+                    {
+                        site.Bindings.RemoveAt(i);
+                        manager.CommitChanges();
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         #endregion
 
