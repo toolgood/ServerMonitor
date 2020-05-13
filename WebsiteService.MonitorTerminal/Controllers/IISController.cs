@@ -29,6 +29,20 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Json(r);
         }
 
+        [HttpGet("IIS/GetSiteByName")]
+        public IActionResult GetSiteByName(string siteName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(siteName)] = siteName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var r = IISUtil.GetSiteByName(siteName);
+            return Json(r);
+        }
+
         [HttpGet("IIS/GetAppPools")]
         public IActionResult GetAppPools(long timestamp, string sign)
         {
@@ -42,6 +56,19 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Json(r);
         }
 
+        [HttpGet("IIS/GetAppPoolByname")]
+        public IActionResult GetAppPoolByname(string poolName, long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(poolName)] = poolName.ToString();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var r = IISUtil.GetAppPoolByname(poolName);
+            return Json(r);
+        }
 
         #region 站点 启动 暂停 删除 ResetSite
         [HttpGet("IIS/StartSite")]

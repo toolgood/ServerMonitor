@@ -88,6 +88,18 @@ namespace WebsiteService.MonitorTerminal.Utils
             return siteInfos;
         }
 
+        public static SiteInfo GetSiteByName(string siteName)
+        {
+            using (var server = new ServerManager())
+            {
+                foreach (var item in server.Sites)
+                {
+                    if (item.Name != siteName) { continue; }
+                    return new SiteInfo(item);
+                }
+            }
+            return null;
+        }
         #endregion
 
         #region 获取应用程序池
@@ -125,6 +137,18 @@ namespace WebsiteService.MonitorTerminal.Utils
             return appPools;
         }
 
+        public static AppPoolInfo GetAppPoolByname(string poolName)
+        {
+            using (var server = new ServerManager())
+            {
+                foreach (var item in server.ApplicationPools)
+                {
+                    if (item.Name != poolName) { continue; }
+                    return new AppPoolInfo(item);
+                }
+            }
+            return null;
+        }
         #endregion
 
         #region 站点 新建 
@@ -311,14 +335,14 @@ namespace WebsiteService.MonitorTerminal.Utils
         public static List<CertificateInfo> GetCertificates()
         {
             List<CertificateInfo> names = new List<CertificateInfo>();
-            X509Store userCaStore = new X509Store(StoreName.My,StoreLocation.LocalMachine);
+            X509Store userCaStore = new X509Store(StoreName.My, StoreLocation.LocalMachine);
             try
             {
                 userCaStore.Open(OpenFlags.ReadOnly);
                 X509Certificate2Collection certificatesInStore = userCaStore.Certificates;
                 foreach (var item in certificatesInStore)
                 {
-                    if (item.NotAfter>DateTime.Now && item.NotBefore<DateTime.Now)
+                    if (item.NotAfter > DateTime.Now && item.NotBefore < DateTime.Now)
                     {
                         names.Add(new CertificateInfo()
                         {
@@ -330,13 +354,13 @@ namespace WebsiteService.MonitorTerminal.Utils
                 }
                 return names;
             }
-            finally 
+            finally
             {
                 userCaStore.Close();
             }
         }
         #endregion
- 
+
 
     }
 
