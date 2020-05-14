@@ -27,6 +27,8 @@ namespace WebsiteService.MonitorTerminal.Utils
             key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
             DisplayInstalledApps(key, softwareInfos);
 
+
+            softwareInfos = softwareInfos.OrderBy(q => q.Name).ToList();
             return softwareInfos;
         }
 
@@ -42,7 +44,6 @@ namespace WebsiteService.MonitorTerminal.Utils
                     if (displayName == null) { continue; }
                     if (softwareInfos.Any(q => q.Name == displayName)) continue;
                     SoftwareInfo info = new SoftwareInfo();
-                    softwareInfos.Add(info);
 
                     info.Name = displayName;
                     info.Icon = subkey.GetValue("DisplayIcon") as string;
@@ -54,6 +55,26 @@ namespace WebsiteService.MonitorTerminal.Utils
                     {
                         info.Icon = info.Icon.Trim('"');
                     }
+                    if (string.IsNullOrWhiteSpace(info.InstallLocation))
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrWhiteSpace(info.Icon) && softwareInfos.Any(q => info.InstallLocation==q.InstallLocation && info.Publisher == q.Publisher))
+                    {
+                        continue;
+                    }
+                    //if (string.IsNullOrWhiteSpace(info.Icon) && softwareInfos.Any(q => info.InstallLocation.StartsWith(q.InstallLocation) && info.Publisher == q.Publisher))
+                    //{
+                    //    continue;
+                    //}
+                    //if (string.IsNullOrWhiteSpace(info.Icon) == false)
+                    //{
+                    //    softwareInfos.RemoveAll(q => q.InstallLocation == info.InstallLocation
+                    //                && info.Publisher == q.Publisher
+                    //                && string.IsNullOrWhiteSpace(q.Icon));
+                    //}
+                    softwareInfos.Add(info);
+
                 }
             }
         }
