@@ -15,7 +15,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
         {
         }
 
-        [HttpPost]
+        [HttpGet("Time/GetTime")]
         public IActionResult GetTime(long timestamp, string sign)
         {
             if (IsSignParameter())
@@ -28,7 +28,7 @@ namespace WebsiteService.MonitorTerminal.Controllers
             return Content(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
         }
 
-        [HttpPost]
+        [HttpGet("Time/SetTime")]
         public IActionResult SetTime(DateTime newTime, long timestamp, string sign)
         {
             if (IsSignParameter())

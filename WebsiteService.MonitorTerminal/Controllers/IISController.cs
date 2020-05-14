@@ -16,6 +16,20 @@ namespace WebsiteService.MonitorTerminal.Controllers
         {
         }
 
+        [HttpGet("IIS/GetProcessInfo")]
+        public IActionResult GetProcessInfo(long timestamp, string sign)
+        {
+            if (IsSignParameter())
+            {
+                SortedDictionary<string, string> keys = new SortedDictionary<string, string>();
+                keys[nameof(timestamp)] = timestamp.ToString();
+                if (GetSignHash(keys).Equals(sign, System.StringComparison.CurrentCultureIgnoreCase) == false) { return StatusCode(404); }
+            }
+            var pis = IISUtil.GetProcesses();
+            return Json(pis);
+        }
+
+
         [HttpGet("IIS/GetSiteList")]
         public IActionResult GetSiteList(long timestamp, string sign)
         {

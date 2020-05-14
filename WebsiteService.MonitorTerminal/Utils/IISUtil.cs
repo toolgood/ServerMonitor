@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Web.Administration;
+using WebsiteService.MonitorTerminal.Datas;
 using WebsiteService.MonitorTerminal.Datas.IIS;
+using WebsiteService.MonitorTerminal.Monitors;
 
 namespace WebsiteService.MonitorTerminal.Utils
 {
@@ -228,7 +231,7 @@ namespace WebsiteService.MonitorTerminal.Utils
                         if (vd.Path == "/" + directoryName)
                         {
                             app.VirtualDirectories.RemoveAt(j);
-                            if (app.VirtualDirectories.Count==0)
+                            if (app.VirtualDirectories.Count == 0)
                             {
                                 site.Applications.RemoveAt(i);
                             }
@@ -512,7 +515,53 @@ namespace WebsiteService.MonitorTerminal.Utils
         }
         #endregion
 
+        #region 获取性能信息
+        public static List<SiteProcessInfo> GetProcesses()
+        {
+            List<SiteProcessInfo> list = new List<SiteProcessInfo>();
+            var server = new ServerManager();//请使用管理员模式
+            foreach (Site site in server.Sites)
+            {
+                SiteProcessInfo siteInfo = new SiteProcessInfo()
+                {
+                    Name = site.Name,
+                    ProcessInfo = new Dictionary<string, ProcessInfo>()
+                };
+                foreach (var application in site.Applications)
+                {
+                    siteInfo.ProcessInfo[application.ApplicationPoolName] = new ProcessInfo();
+                }
+                list.Add(siteInfo);
+            }
+            foreach (var item in server.ApplicationPools)
+            {
+                foreach (WorkerProcess workerProcess in item.WorkerProcesses)
+                {
+                    var t = workerProcess.ProcessId;
+                    var processes = Process.GetProcesses();
+                    var p = processes.FirstOrDefault(q => q.Id == t);
+                    ProcessMonitor processMonitor = new ProcessMonitor(p);
+                    processMonitor.Init();
+                    processMonitor.UpdateInfo();
+                    foreach (var site in list)
+                    {
+                        if (site.ProcessInfo.TryGetValue(workerProcess.AppPoolName,out ProcessInfo processInfo))
+                        {
+                            processInfo.Id = workerProcess.ProcessId;
+                            processInfo.InstanceName = processMonitor.InstanceName;
+                            processInfo.ProcessName = processMonitor.ProcessName;
+                            processInfo.FileName = processMonitor.FileName;
+                            processInfo.MemoryUsage = processMonitor.MemoryUsage;
+                            processInfo.CpuUsage = processMonitor.CpuUsage;
+                        }
+                    }
+                    processMonitor.Dispose();
+                }
+            }
+            return list;
+        }
 
+        #endregion
     }
 
 }
