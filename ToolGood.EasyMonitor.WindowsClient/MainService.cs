@@ -4,22 +4,25 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.Extensions.Hosting;
 
-namespace WebsiteService.AutoGuard
+namespace ToolGood.EasyMonitor.WindowsClient
 {
     public class MainService
     {
         private readonly Timer _timer;
-        public MainService()
+        private readonly IHost _host;
+        public MainService(IHost host)
         {
-            _timer = new Timer(30 * 1000) { AutoReset = true };
+            _host = host;
+            _timer = new Timer(5 * 60 * 1000) { AutoReset = true };
             _timer.Elapsed += Timer_Elapsed;
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var scs = ServiceController.GetServices();
-            var service = scs.FirstOrDefault(q => q.ServiceName == "WebsiteService.MonitorTerminal");
+            var service = scs.FirstOrDefault(q => q.ServiceName == "ToolGood.EasyMonitor.WindowsGuard");
             if (service != null)
             {
                 if (service.StartType != ServiceStartMode.Disabled)
@@ -34,15 +37,22 @@ namespace WebsiteService.AutoGuard
                     }
                 }
             }
+
+            //var monitorInfo = MonitorUtil.GetMachineMonitorInfo();
+            //var sites = MonitorUtil.GetSiteInfos();
         }
         public void Start()
         {
+            Timer_Elapsed(_timer, null);
             _timer.Start();
+            _host.Run();
         }
-        public void Stop()
+        public async Task Stop()
         {
             _timer.Stop();
+            await _host.StopAsync();
         }
 
     }
+
 }

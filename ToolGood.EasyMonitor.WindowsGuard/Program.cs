@@ -1,17 +1,17 @@
 ﻿using System;
 using Topshelf;
 
-namespace WebsiteService.AutoGuard
+namespace ToolGood.EasyMonitor.WindowsGuard
 {
-    internal class Program
+    class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
             var rc = HostFactory.Run(x =>
             {
-                x.SetDisplayName("守护程序");
-                x.SetDescription("守护程序");
-                x.SetServiceName("WebsiteService.AutoGuard");
+                x.SetDisplayName("Windows监控守护程序");
+                x.SetDescription("Windows监控守护程序");
+                x.SetServiceName("ToolGood.EasyMonitor.WindowsGuard");
 
                 x.Service<MainService>(s =>
                 {
