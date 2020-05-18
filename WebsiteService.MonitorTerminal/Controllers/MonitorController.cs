@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +50,8 @@ namespace WebsiteService.MonitorTerminal.Controllers
 
             if (string.IsNullOrEmpty(noticeUrl))
             {
-                var pis = ProcessUtil.GetProcessInfos();
+                var pis = ProcessUtil.GetProcessInfos2();
+                pis = pis.OrderBy(q => q.CpuUsage).ToList();
                 return Json(pis);
             }
             Task.Run(async () =>

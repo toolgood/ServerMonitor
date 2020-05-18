@@ -20,7 +20,7 @@
     "WebsiteService.MonitorTerminal": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "IIS/GetProcessInfo",
+      "launchUrl": "Monitor/GetProcessInfo",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

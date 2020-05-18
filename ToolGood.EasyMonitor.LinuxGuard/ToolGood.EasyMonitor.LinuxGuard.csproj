@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-ToolGood.EasyMonitor.LinuxGuard-A18228CF-8599-4773-A257-5BB6907CA1A7</UserSecretsId>
+    <AssemblyName>EasyMonitor.LinuxGuard</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="3.1.4" />
+  </ItemGroup>
+</Project>

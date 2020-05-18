@@ -56,83 +56,63 @@ namespace WebsiteService.MonitorTerminal.Utils
         }
 
 
-        public struct ProInfo
-        {
-            //进程名 
-            public string stringName;
-
-            //进程ID 
-            public string stringPID;
-
-            //父进程ID 
-            public string stringFID;
-
-            //用户名 
-            public string stringUser;
-
-            //CPU占用率 
-            public string stringCPU;
-
-            //RAM占用量 
-            public string stringRAM;
-        }
-
-
-        private static ManagementObjectCollection ExecSearch(string command)
-        {
-            ManagementObjectCollection moc = null;
-            ObjectQuery objQuery = new ObjectQuery(command);
-            string stringMachineName = "localhost";
-            ManagementScope scope = new ManagementScope("\\\\" + stringMachineName + "\\root\\cimv2");
-            //ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * From Win32_PerfFormattedData_PerfProc_Process");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(objQuery);
-            try {
-                moc = searcher.Get();
-            } catch (Exception x) {
-                //MessageBox.Show("Error:" + x.Message);
-            }
-            return moc;
-        }
 
         public static List<ProcessInfo> GetProcessInfos2()
         {
-            ManagementObjectCollection moc = null;
-            ManagementObjectCollection moc1 = null;
-            var processes = Process.GetProcesses().ToList();
-            processes.RemoveAll(q => q.Id == 0);
-            var pro = processes.Select(q => q.ProcessName).ToList();
+            int processorCount = Environment.ProcessorCount;
+            List<ProcessInfo> infos = new List<ProcessInfo>();
+            ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_PerfProc_Process");
+            foreach (ManagementObject mo in searcher2.Get())
+            {
+                ProcessInfo info = new ProcessInfo();
+                info.Id = int.Parse(mo["IDProcess"].ToString());
+                if (info.Id == 0) { continue; }
+                info.InstanceName = mo["Name"].ToString();
+                info.CpuUsage = float.Parse(mo.Properties["PercentProcessorTime"].Value.ToString())/ processorCount;
+                info.MemoryUsage = (float) (Convert.ToInt64(mo["WorkingSetPrivate"]) / (1024 * 1024));
+                infos.Add(info);
+            }
+            searcher2.Dispose();
 
-            int pnum = 0;
-            ProInfo[] proInfomation;
-            proInfomation = new ProInfo[pro.Count];
-            foreach (string p in pro) {
-                pnum++;
-
-                string selstr = "SELECT * FROM Win32_Process Where Name='" + p + "'";
-                moc = ExecSearch(selstr);
-
-
-                foreach (ManagementObject mo in moc) {
-                    proInfomation[pnum].stringName = mo["Name"].ToString();
-                    proInfomation[pnum].stringPID = mo["ProcessID"].ToString();
-                    proInfomation[pnum].stringFID = mo["ParentProcessID"].ToString();
-
-                    string selstr2 = "SELECT * FROM Win32_PerfFormattedData_PerfProc_Process Where IDProcess=" + proInfomation[pnum].stringPID;
-                    moc1 = ExecSearch(selstr2);
-
-                    if (moc1 == null) {
-                        continue;
+            var processes = Process.GetProcesses();
+            foreach (var process in processes)
+            {
+                if (process.Id == 0) { continue; }
+                var info = infos.FirstOrDefault(q => q.Id == process.Id);
+                if (info!=null)
+                {
+                    info.ProcessName = process.ProcessName;
+                    try
+                    {
+                        if (process.MainModule != null)
+                        {
+                            info.FileName = process.MainModule.FileName;
+                        }
                     }
-
-
-                    foreach (ManagementObject mo1 in moc1) {
-                        proInfomation[pnum].stringCPU = mo1.Properties["PercentProcessorTime"].Value.ToString();
-                        proInfomation[pnum].stringRAM = (Convert.ToInt32(mo1["VirtualBytes"]) / (10 * 1024 * 1024)).ToString();
-                    }
-
+                    catch (Exception) { }
                 }
             }
-            return null;
+
+            //ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
+            //foreach (ManagementObject mo in searcher.Get())
+            //{
+            //    ProcessInfo info = new ProcessInfo();
+            //    info.FileName = mo["Name"].ToString();
+            //    info.Id = int.Parse(mo["ProcessID"].ToString());
+
+            //    ManagementObjectSearcher searcher2 = new ManagementObjectSearcher("SELECT * FROM Win32_PerfFormattedData_PerfProc_Process Where IDProcess=" + info.Id);
+            //    foreach (ManagementObject mo2 in searcher2.Get())
+            //    {
+            //        info.CpuUsage =float.Parse( mo2.Properties["PercentProcessorTime"].Value.ToString());
+            //        info.MemoryUsage = (float)(Convert.ToInt64(mo2["VirtualBytes"]) / (10 * 1024 * 1024));
+            //        //IDProcess
+            //        //Name,PercentProcessorTime 
+            //    }
+            //    infos.Add(info);
+            //    searcher2.Dispose();
+            //}
+            return infos;
+
         }
 
 

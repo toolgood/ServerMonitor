@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "ToolGood.EasyMonitor.LinuxGuard": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
