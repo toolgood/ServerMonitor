@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolGood.EasyMonitor.Window
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolGood.EasyMonitor.LinuxGuard", "ToolGood.EasyMonitor.LinuxGuard\ToolGood.EasyMonitor.LinuxGuard.csproj", "{577E55F0-93FA-401F-A770-BEECC6B120CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolGood.EasyMonitor.BackgroundSystem", "ToolGood.EasyMonitor.BackgroundSystem\ToolGood.EasyMonitor.BackgroundSystem.csproj", "{109C6671-0BA9-443F-B164-92ED2CDB5C67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolGood.EasyMonitor.BackgroundSystem", "ToolGood.EasyMonitor.BackgroundSystem\ToolGood.EasyMonitor.BackgroundSystem.csproj", "{109C6671-0BA9-443F-B164-92ED2CDB5C67}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Client", "_Client", "{F636532C-1A91-4A61-9140-3B0310F7FE70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolGood.EasyMonitor.LinuxClient", "ToolGood.EasyMonitor.LinuxClient\ToolGood.EasyMonitor.LinuxClient.csproj", "{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,9 +55,22 @@ Global
 		{109C6671-0BA9-443F-B164-92ED2CDB5C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{109C6671-0BA9-443F-B164-92ED2CDB5C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{109C6671-0BA9-443F-B164-92ED2CDB5C67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24931932-E819-4F67-9207-328B6C0F5513} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{077A377A-9353-48C2-B2C2-0BA0C07171C7} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{FAD4E351-22E5-4E09-B691-75F1732DD5FD} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{30D71F19-4EF1-4D04-9489-5665D0E27072} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{626031A0-7BE5-44C0-9080-F5DD8033E0B5} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{577E55F0-93FA-401F-A770-BEECC6B120CE} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
+		{116A0E88-0E2E-4A7B-8A31-B30F7D2E49C5} = {F636532C-1A91-4A61-9140-3B0310F7FE70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {534EA975-9745-4A7B-AB1D-9457235432F1}
